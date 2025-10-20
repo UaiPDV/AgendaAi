@@ -1,0 +1,25 @@
+/* Estilo personalizado para scrollbar esconder */
+.scrollbar-hide {
+	-ms-overflow-style: none; /* IE e Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+	display: none; /* Chrome, Safari e Opera */
+}
+
+/* Animações de fadeIn */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.animate-fade-in {
+	animation: fadeIn 0.2s ease-out;
+}

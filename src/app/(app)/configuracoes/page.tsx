@@ -16,19 +16,18 @@ export default function ConfiguracoesPage() {
 		<div className="space-y-6">
 			<header>
 				<h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100">
-					Configurações
+					Configura��es
 				</h2>
 				<p className="mt-1 text-gray-500 dark:text-gray-400">
-					Gerencie as configurações da sua conta.
+					Gerencie as configura��es da sua conta.
 				</p>
 			</header>
 
 			<div className="space-y-6">
-				{/* Preferências */}
-				<SettingsCard title="Preferências">
+				<SettingsCard title="Prefer�ncias">
 					<SettingsItem
 						label="Tema Escuro"
-						description="Ative o modo escuro para melhor visualização noturna"
+						description="Ative o modo escuro para melhor visualiza��o noturna"
 						control={
 							<Switch
 								checked={theme === 'dark'}
@@ -43,19 +42,15 @@ export default function ConfiguracoesPage() {
 					/>
 				</SettingsCard>
 
-				{/* Segurança */}
-				<SettingsCard title="Segurança">
+				<SettingsCard title="Seguran�a">
 					<SettingsButton showArrow>Alterar Senha</SettingsButton>
-
 					<SettingsButton showArrow>
-						Autenticação em Dois Fatores
+						Autentica��o em Dois Fatores
 					</SettingsButton>
 				</SettingsCard>
 
-				{/* Conta */}
 				<SettingsCard title="Conta">
 					<SettingsButton>Sair da Conta</SettingsButton>
-
 					<SettingsButton variant="danger">
 						Excluir Conta
 					</SettingsButton>

@@ -20,9 +20,6 @@ export function NavSection({
 					{title}
 				</h2>
 			)}
-
-			{/* A linha separadora foi completamente removida */}
-
 			<div className="space-y-1">{children}</div>
 		</div>
 	);

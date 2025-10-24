@@ -20,10 +20,9 @@ router.get('/:id', authenticateToken, async (req, res) => {
 		const { id } = req.params;
 
 		db = await openDb();
-		const cliente = await db.get(
-			`SELECT * FROM clientes WHERE id = ?`,
-			[id]
-		);
+		const cliente = await db.get(`SELECT * FROM clientes WHERE id = ?`, [
+			id,
+		]);
 
 		if (!cliente) {
 			return res.status(404).json({ message: 'Cliente não encontrado' });

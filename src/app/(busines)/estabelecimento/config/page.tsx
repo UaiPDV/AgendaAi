@@ -35,9 +35,7 @@ export default function ConfiguracaoEstabelecimentoPage() {
 		);
 	}
 
-	const handleWorkPattern = (
-		pattern: 'seg-sex' | 'seg-sab' | 'seg-dom'
-	) => {
+	const handleWorkPattern = (pattern: 'seg-sex' | 'seg-sab' | 'seg-dom') => {
 		const patterns: Record<string, number[]> = {
 			'seg-sex': [1, 2, 3, 4, 5],
 			'seg-sab': [1, 2, 3, 4, 5, 6],
@@ -56,7 +54,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 				Configuração do Estabelecimento
 			</h2>
 			<p className="mt-1 text-sm sm:text-base text-gray-500 dark:text-gray-400">
-				Gerencie horários de funcionamento, feriados e bloqueios de agenda.
+				Gerencie horários de funcionamento, feriados e bloqueios de
+				agenda.
 			</p>
 
 			{/* Horário de Funcionamento */}
@@ -67,7 +66,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 						Horário de Funcionamento
 					</h3>
 					<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-						Defina os dias e horários em que seu estabelecimento funciona
+						Defina os dias e horários em que seu estabelecimento
+						funciona
 					</p>
 				</div>
 				<div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -86,7 +86,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								}`}
 							>
 								<i className="fas fa-briefcase text-xl sm:text-2xl text-gray-600 dark:text-gray-400 mb-2"></i>
-								<p className="font-medium text-sm sm:text-base">Segunda a Sexta</p>
+								<p className="font-medium text-sm sm:text-base">
+									Segunda a Sexta
+								</p>
 								<p className="text-xs text-gray-500 dark:text-gray-400">
 									5 dias por semana
 								</p>
@@ -100,7 +102,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								}`}
 							>
 								<i className="fas fa-calendar-week text-xl sm:text-2xl text-gray-600 dark:text-gray-400 mb-2"></i>
-								<p className="font-medium text-sm sm:text-base">Segunda a Sábado</p>
+								<p className="font-medium text-sm sm:text-base">
+									Segunda a Sábado
+								</p>
 								<p className="text-xs text-gray-500 dark:text-gray-400">
 									6 dias por semana
 								</p>
@@ -114,7 +118,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								}`}
 							>
 								<i className="fas fa-calendar text-xl sm:text-2xl text-gray-800 dark:text-gray-300 mb-2"></i>
-								<p className="font-medium text-sm sm:text-base">Todos os Dias</p>
+								<p className="font-medium text-sm sm:text-base">
+									Todos os Dias
+								</p>
 								<p className="text-xs text-gray-500 dark:text-gray-400">
 									7 dias por semana
 								</p>
@@ -150,12 +156,21 @@ export default function ConfiguracaoEstabelecimentoPage() {
 									<input
 										type="checkbox"
 										id={`day-${dia.value}`}
-										checked={config.diasTrabalho.includes(dia.value)}
+										checked={config.diasTrabalho.includes(
+											dia.value
+										)}
 										onChange={(e) => {
 											const novos = e.target.checked
-												? [...config.diasTrabalho, dia.value]
-												: config.diasTrabalho.filter((d) => d !== dia.value);
-											atualizarConfig({ diasTrabalho: novos });
+												? [
+														...config.diasTrabalho,
+														dia.value,
+												  ]
+												: config.diasTrabalho.filter(
+														(d) => d !== dia.value
+												  );
+											atualizarConfig({
+												diasTrabalho: novos,
+											});
 										}}
 										className="w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
 									/>
@@ -178,7 +193,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 									type="time"
 									value={config.horarioAbertura}
 									onChange={(e) =>
-										atualizarConfig({ horarioAbertura: e.target.value })
+										atualizarConfig({
+											horarioAbertura: e.target.value,
+										})
 									}
 									className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-800"
 								/>
@@ -191,7 +208,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 									type="time"
 									value={config.horarioFechamento}
 									onChange={(e) =>
-										atualizarConfig({ horarioFechamento: e.target.value })
+										atualizarConfig({
+											horarioFechamento: e.target.value,
+										})
 									}
 									className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-800"
 								/>
@@ -203,7 +222,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								id="intervalo"
 								checked={config.possuiIntervalo}
 								onChange={(e) =>
-									atualizarConfig({ possuiIntervalo: e.target.checked })
+									atualizarConfig({
+										possuiIntervalo: e.target.checked,
+									})
 								}
 								className="w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
 							/>
@@ -224,7 +245,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 										type="time"
 										value={config.intervaloInicio || ''}
 										onChange={(e) =>
-											atualizarConfig({ intervaloInicio: e.target.value })
+											atualizarConfig({
+												intervaloInicio: e.target.value,
+											})
 										}
 										className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-800"
 									/>
@@ -237,7 +260,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 										type="time"
 										value={config.intervaloFim || ''}
 										onChange={(e) =>
-											atualizarConfig({ intervaloFim: e.target.value })
+											atualizarConfig({
+												intervaloFim: e.target.value,
+											})
 										}
 										className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-800"
 									/>
@@ -258,7 +283,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								Horários por Profissional
 							</h3>
 							<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-								Configure horários específicos para cada profissional
+								Configure horários específicos para cada
+								profissional
 							</p>
 						</div>
 						<label className="flex items-center cursor-pointer">
@@ -267,7 +293,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								checked={config.horariosIndividuaisAtivo}
 								onChange={(e) =>
 									atualizarConfig({
-										horariosIndividuaisAtivo: e.target.checked,
+										horariosIndividuaisAtivo:
+											e.target.checked,
 									})
 								}
 								className="w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
@@ -284,10 +311,13 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							<div className="flex items-start gap-2">
 								<i className="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-1"></i>
 								<div className="text-sm text-blue-800 dark:text-blue-300">
-									<strong>Funcionalidade em Desenvolvimento</strong>
+									<strong>
+										Funcionalidade em Desenvolvimento
+									</strong>
 									<p className="mt-1">
-										Em breve você poderá configurar horários individuais para
-										cada profissional do seu estabelecimento.
+										Em breve você poderá configurar horários
+										individuais para cada profissional do
+										seu estabelecimento.
 									</p>
 								</div>
 							</div>
@@ -314,7 +344,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							id="feriados-nacionais"
 							checked={config.fecharFeriadosNacionais}
 							onChange={(e) =>
-								atualizarConfig({ fecharFeriadosNacionais: e.target.checked })
+								atualizarConfig({
+									fecharFeriadosNacionais: e.target.checked,
+								})
 							}
 							className="mt-1 w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
 						/>
@@ -326,7 +358,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								Fechar em Feriados Nacionais
 							</label>
 							<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-								O estabelecimento não aceitará agendamentos em feriados nacionais
+								O estabelecimento não aceitará agendamentos em
+								feriados nacionais
 							</p>
 						</div>
 					</div>
@@ -336,7 +369,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							id="feriados-locais"
 							checked={config.fecharFeriadosMunicipais}
 							onChange={(e) =>
-								atualizarConfig({ fecharFeriadosMunicipais: e.target.checked })
+								atualizarConfig({
+									fecharFeriadosMunicipais: e.target.checked,
+								})
 							}
 							className="mt-1 w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
 						/>
@@ -348,7 +383,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								Fechar em Feriados Municipais
 							</label>
 							<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-								O estabelecimento não aceitará agendamentos em feriados locais
+								O estabelecimento não aceitará agendamentos em
+								feriados locais
 							</p>
 						</div>
 					</div>
@@ -380,8 +416,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							)}
 						</div>
 						<button className="mt-3 w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-600 dark:text-gray-400 hover:border-gray-400 hover:text-gray-800 dark:hover:border-gray-500 dark:hover:text-gray-300 transition-colors text-sm sm:text-base">
-							<i className="fas fa-plus mr-2"></i>Adicionar Feriado
-							Personalizado
+							<i className="fas fa-plus mr-2"></i>Adicionar
+							Feriado Personalizado
 						</button>
 					</div>
 				</div>
@@ -403,10 +439,13 @@ export default function ConfiguracaoEstabelecimentoPage() {
 						<div className="flex items-start gap-2">
 							<i className="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-1"></i>
 							<div className="text-sm text-blue-800 dark:text-blue-300">
-								<strong>Funcionalidade em Desenvolvimento</strong>
+								<strong>
+									Funcionalidade em Desenvolvimento
+								</strong>
 								<p className="mt-1">
-									Em breve você poderá bloquear datas específicas através de um
-									calendário interativo.
+									Em breve você poderá bloquear datas
+									específicas através de um calendário
+									interativo.
 								</p>
 							</div>
 						</div>
@@ -430,7 +469,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							id="antecedencia-minima"
 							checked={config.antecedenciaMinimaAtivo}
 							onChange={(e) =>
-								atualizarConfig({ antecedenciaMinimaAtivo: e.target.checked })
+								atualizarConfig({
+									antecedenciaMinimaAtivo: e.target.checked,
+								})
 							}
 							className="mt-1 w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
 						/>
@@ -447,7 +488,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 									value={config.antecedenciaMinima}
 									onChange={(e) =>
 										atualizarConfig({
-											antecedenciaMinima: Number(e.target.value),
+											antecedenciaMinima: Number(
+												e.target.value
+											),
 										})
 									}
 									disabled={!config.antecedenciaMinimaAtivo}
@@ -472,7 +515,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							id="limite-agendamentos"
 							checked={config.limiteAgendamentosAtivo}
 							onChange={(e) =>
-								atualizarConfig({ limiteAgendamentosAtivo: e.target.checked })
+								atualizarConfig({
+									limiteAgendamentosAtivo: e.target.checked,
+								})
 							}
 							className="mt-1 w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
 						/>
@@ -489,7 +534,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 									value={config.limiteAgendamentosSimultaneos}
 									onChange={(e) =>
 										atualizarConfig({
-											limiteAgendamentosSimultaneos: Number(e.target.value),
+											limiteAgendamentosSimultaneos:
+												Number(e.target.value),
 										})
 									}
 									disabled={!config.limiteAgendamentosAtivo}
@@ -513,7 +559,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							id="confirmacao-automatica"
 							checked={config.confirmacaoAutomatica}
 							onChange={(e) =>
-								atualizarConfig({ confirmacaoAutomatica: e.target.checked })
+								atualizarConfig({
+									confirmacaoAutomatica: e.target.checked,
+								})
 							}
 							className="mt-1 w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
 						/>
@@ -525,8 +573,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								Confirmação Automática de Agendamentos
 							</label>
 							<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-								Agendamentos serão confirmados automaticamente sem necessidade de
-								aprovação manual
+								Agendamentos serão confirmados automaticamente
+								sem necessidade de aprovação manual
 							</p>
 						</div>
 					</div>
@@ -538,7 +586,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							id="buffer-entre-servicos"
 							checked={config.bufferEntreServicosAtivo}
 							onChange={(e) =>
-								atualizarConfig({ bufferEntreServicosAtivo: e.target.checked })
+								atualizarConfig({
+									bufferEntreServicosAtivo: e.target.checked,
+								})
 							}
 							className="mt-1 w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
 						/>
@@ -555,7 +605,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 									value={config.bufferEntreServicos}
 									onChange={(e) =>
 										atualizarConfig({
-											bufferEntreServicos: Number(e.target.value),
+											bufferEntreServicos: Number(
+												e.target.value
+											),
 										})
 									}
 									disabled={!config.bufferEntreServicosAtivo}
@@ -579,7 +631,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							checked={config.cancelamentoAntecedenciaAtivo}
 							onChange={(e) =>
 								atualizarConfig({
-									cancelamentoAntecedenciaAtivo: e.target.checked,
+									cancelamentoAntecedenciaAtivo:
+										e.target.checked,
 								})
 							}
 							className="mt-1 w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
@@ -597,10 +650,14 @@ export default function ConfiguracaoEstabelecimentoPage() {
 									value={config.cancelamentoAntecedencia}
 									onChange={(e) =>
 										atualizarConfig({
-											cancelamentoAntecedencia: Number(e.target.value),
+											cancelamentoAntecedencia: Number(
+												e.target.value
+											),
 										})
 									}
-									disabled={!config.cancelamentoAntecedenciaAtivo}
+									disabled={
+										!config.cancelamentoAntecedenciaAtivo
+									}
 									className="mx-1 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50 text-xs sm:text-sm"
 								>
 									<option value="1">1 hora</option>
@@ -620,7 +677,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 							id="reagendamento-permitido"
 							checked={config.reagendamentoPermitido}
 							onChange={(e) =>
-								atualizarConfig({ reagendamentoPermitido: e.target.checked })
+								atualizarConfig({
+									reagendamentoPermitido: e.target.checked,
+								})
 							}
 							className="mt-1 w-4 h-4 sm:w-5 sm:h-5 text-gray-800 dark:text-gray-300 rounded focus:ring-gray-800"
 						/>
@@ -632,8 +691,8 @@ export default function ConfiguracaoEstabelecimentoPage() {
 								Permitir Reagendamento pelo Cliente
 							</label>
 							<p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-								Clientes podem reagendar seus agendamentos sem aprovação do
-								estabelecimento
+								Clientes podem reagendar seus agendamentos sem
+								aprovação do estabelecimento
 							</p>
 						</div>
 					</div>
@@ -655,8 +714,9 @@ export default function ConfiguracaoEstabelecimentoPage() {
 				<div className="flex items-center gap-2">
 					<i className="fas fa-info-circle text-blue-600 dark:text-blue-400"></i>
 					<p className="text-sm text-blue-700 dark:text-blue-300">
-						<strong>Salvamento Automático Ativo:</strong> Suas alterações são
-						salvas automaticamente após 300ms de inatividade.
+						<strong>Salvamento Automático Ativo:</strong> Suas
+						alterações são salvas automaticamente após 300ms de
+						inatividade.
 					</p>
 				</div>
 			</div>

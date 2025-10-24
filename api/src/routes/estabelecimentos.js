@@ -219,93 +219,103 @@ router.get('/:id/profissionais', async (req, res) => {
  * GET /api/estabelecimentos/:id/clientes
  * Lista os clientes de um estabelecimento.
  */
-router.get('/:id/clientes', [authenticateToken, isEstabelecimento], async (req, res) => {
-	let db;
-	try {
-		const { id } = req.params;
-		
-		// Apenas o próprio estabelecimento pode ver seus clientes
-		// OU usar 'me' como id especial
-		if (id !== 'me' && String(req.user.id) !== String(id)) {
-			return res.status(403).json({ 
-				message: 'Você não tem permissão para acessar esses clientes.' 
+router.get(
+	'/:id/clientes',
+	[authenticateToken, isEstabelecimento],
+	async (req, res) => {
+		let db;
+		try {
+			const { id } = req.params;
+
+			// Apenas o próprio estabelecimento pode ver seus clientes
+			// OU usar 'me' como id especial
+			if (id !== 'me' && String(req.user.id) !== String(id)) {
+				return res.status(403).json({
+					message:
+						'Você não tem permissão para acessar esses clientes.',
+				});
+			}
+
+			const estabelecimentoId = id === 'me' ? req.user.id : id;
+
+			db = await openDb();
+			const clientes = await db.all(
+				'SELECT * FROM clientes WHERE estabelecimento_id = ? ORDER BY nome ASC',
+				[estabelecimentoId]
+			);
+			res.status(200).json(clientes);
+		} catch (error) {
+			console.error('Erro ao listar clientes:', error);
+			res.status(500).json({
+				message: 'Erro interno ao listar clientes.',
 			});
+		} finally {
+			if (db) await db.close();
 		}
-
-		const estabelecimentoId = id === 'me' ? req.user.id : id;
-
-		db = await openDb();
-		const clientes = await db.all(
-			'SELECT * FROM clientes WHERE estabelecimento_id = ? ORDER BY nome ASC',
-			[estabelecimentoId]
-		);
-		res.status(200).json(clientes);
-	} catch (error) {
-		console.error('Erro ao listar clientes:', error);
-		res.status(500).json({
-			message: 'Erro interno ao listar clientes.',
-		});
-	} finally {
-		if (db) await db.close();
 	}
-});
+);
 
 /**
  * POST /api/estabelecimentos/:id/clientes
  * Cria um novo cliente para o estabelecimento.
  */
-router.post('/:id/clientes', [authenticateToken, isEstabelecimento], async (req, res) => {
-	let db;
-	try {
-		const { id } = req.params;
-		const { nome, email, telefone } = req.body;
+router.post(
+	'/:id/clientes',
+	[authenticateToken, isEstabelecimento],
+	async (req, res) => {
+		let db;
+		try {
+			const { id } = req.params;
+			const { nome, email, telefone } = req.body;
 
-		// Validação
-		if (!nome?.trim()) {
-			return res.status(400).json({ message: 'Nome é obrigatório' });
-		}
+			// Validação
+			if (!nome?.trim()) {
+				return res.status(400).json({ message: 'Nome é obrigatório' });
+			}
 
-		// Apenas o próprio estabelecimento pode criar clientes para si
-		// OU usar 'me' como id especial
-		if (id !== 'me' && String(req.user.id) !== String(id)) {
-			return res.status(403).json({ 
-				message: 'Você não tem permissão para criar clientes para este estabelecimento.' 
-			});
-		}
+			// Apenas o próprio estabelecimento pode criar clientes para si
+			// OU usar 'me' como id especial
+			if (id !== 'me' && String(req.user.id) !== String(id)) {
+				return res.status(403).json({
+					message:
+						'Você não tem permissão para criar clientes para este estabelecimento.',
+				});
+			}
 
-		const estabelecimentoId = id === 'me' ? req.user.id : id;
-		const clienteId = crypto.randomUUID();
+			const estabelecimentoId = id === 'me' ? req.user.id : id;
+			const clienteId = crypto.randomUUID();
 
-		db = await openDb();
-		
-		// Cria o cliente
-		await db.run(
-			`INSERT INTO clientes (id, estabelecimento_id, nome, email, telefone) 
+			db = await openDb();
+
+			// Cria o cliente
+			await db.run(
+				`INSERT INTO clientes (id, estabelecimento_id, nome, email, telefone) 
 			 VALUES (?, ?, ?, ?, ?)`,
-			[
-				clienteId,
-				estabelecimentoId,
-				nome.trim(),
-				email || null,
-				telefone || null
-			]
-		);
+				[
+					clienteId,
+					estabelecimentoId,
+					nome.trim(),
+					email || null,
+					telefone || null,
+				]
+			);
 
-		// Retorna o cliente criado
-		const novoCliente = await db.get(
-			'SELECT * FROM clientes WHERE id = ?',
-			[clienteId]
-		);
+			// Retorna o cliente criado
+			const novoCliente = await db.get(
+				'SELECT * FROM clientes WHERE id = ?',
+				[clienteId]
+			);
 
-		res.status(201).json(novoCliente);
-	} catch (error) {
-		console.error('Erro ao criar cliente:', error);
-		res.status(500).json({
-			message: 'Erro interno ao criar cliente.',
-		});
-	} finally {
-		if (db) await db.close();
+			res.status(201).json(novoCliente);
+		} catch (error) {
+			console.error('Erro ao criar cliente:', error);
+			res.status(500).json({
+				message: 'Erro interno ao criar cliente.',
+			});
+		} finally {
+			if (db) await db.close();
+		}
 	}
-});
+);
 
 export default router;

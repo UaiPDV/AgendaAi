@@ -3,10 +3,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { apiRequest, API_ENDPOINTS } from '@/lib/api';
+import {
+	getEstabelecimentos,
+	getEstabelecimentoById,
+} from '@/lib/services/estabelecimento.service';
 import type { Estabelecimento } from '@/types';
 
-export function useEstabelecimentos() {
+export function useEstabelecimentos(search?: string) {
 	const [estabelecimentos, setEstabelecimentos] = useState<Estabelecimento[]>(
 		[]
 	);
@@ -20,9 +23,7 @@ export function useEstabelecimentos() {
 			try {
 				setLoading(true);
 				setError(null);
-				const data = await apiRequest<Estabelecimento[]>(
-					API_ENDPOINTS.ESTABELECIMENTOS
-				);
+				const data = await getEstabelecimentos(search);
 				if (isMounted) {
 					setEstabelecimentos(data);
 				}
@@ -43,7 +44,7 @@ export function useEstabelecimentos() {
 		return () => {
 			isMounted = false;
 		};
-	}, []);
+	}, [search]);
 
 	return { estabelecimentos, loading, error };
 }
@@ -61,9 +62,7 @@ export function useEstabelecimento(id: number) {
 			try {
 				setLoading(true);
 				setError(null);
-				const data = await apiRequest<Estabelecimento>(
-					API_ENDPOINTS.ESTABELECIMENTO_BY_ID(id)
-				);
+				const data = await getEstabelecimentoById(id);
 				if (isMounted) {
 					setEstabelecimento(data);
 				}

@@ -1,99 +1,181 @@
-# AgendaAi API
+# API AgendaAi - Instruções de Instalação
 
-API REST simples para o sistema AgendaAi.
+Esta é a API backend de teste para o projeto AgendaAi, construída com Node.js,
+Express e SQLite, baseada na documentação fornecida.
 
-## 🚀 Como rodar
+## 1. Estrutura de Pastas
+
+A estrutura atual do projeto é:
+
+```
+api/
+├── .env                     (Variáveis de ambiente: Porta, JWT)
+├── package.json             (Dependências e scripts)
+├── readme.md                (Este arquivo)
+├── database/
+│   └── agendaai.sqlite      (Banco SQLite - criado automaticamente)
+└── src/
+    ├── app.js                 (Servidor principal Express)
+    ├── database.js            (Configuração do DB e criação de tabelas)
+    ├── middlewares/
+    │   └── auth.js            (Middleware de autenticação JWT)
+    └── routes/
+        ├── index.js           (Roteador principal da API)
+        ├── agendamentos.js    (Rotas de agendamentos)
+        ├── auth.js            (Rotas de login/registro)
+        ├── estabelecimentos.js(Rotas de estabelecimentos)
+        ├── profissionais.js   (Rotas de profissionais)
+        ├── servicos.js        (Rotas de serviços)
+        └── usuarios.js        (Rotas de usuários)
+```
+
+O arquivo `agendaai.sqlite` será criado automaticamente em `api/database/`
+quando você rodar o comando de setup.
+
+## 2. Instalação
+
+Navegue até a pasta `api` pelo seu terminal:
 
 ```bash
 cd api
+```
+
+E instale as dependências necessárias:
+
+```bash
 npm install
+```
+
+## 3. Configuração
+
+O arquivo `.env` contém as configurações básicas da API:
+
+```env
+PORT=3001
+JWT_SECRET=supersecretkey123
+```
+
+⚠️ **Segurança**: Em produção, altere o `JWT_SECRET` para um valor aleatório e
+seguro.
+
+## 4. Rodando a API
+
+### Setup Inicial (Primeira vez)
+
+Execute este comando **apenas uma vez** antes de iniciar o servidor. Ele cria
+todas as tabelas no banco de dados SQLite:
+
+```bash
+npm run setup
+```
+
+Saída esperada:
+
+```
+Executando setup do banco de dados...
+Verificando e criando tabelas...
+Tabelas criadas com sucesso (se não existiam).
+Setup do banco de dados concluído.
+```
+
+### Modo Desenvolvimento
+
+Inicia o servidor com nodemon (reinicia automaticamente ao salvar arquivos):
+
+```bash
+npm run dev
+```
+
+### Modo Produção
+
+Inicia o servidor sem auto-reload:
+
+```bash
 npm start
 ```
 
-A API estará disponível em `http://localhost:3001`
+🚀 **Sua API estará rodando em** `http://localhost:3001`
 
-## 📚 Endpoints
+## 5. Endpoints
 
-### Autenticação
+## 5. Endpoints
 
--   `POST /api/auth/login` - Login (cliente ou estabelecimento)
--   `POST /api/auth/register` - Cadastro de novo cliente
+A API segue a especificação em `docs/API_SPECIFICATION.md`. Os endpoints
+principais são:
 
-### Estabelecimentos
+### 🔐 Autenticação
 
--   `GET /api/estabelecimentos` - Listar estabelecimentos
--   `GET /api/estabelecimentos/:id` - Buscar estabelecimento por ID
--   `POST /api/estabelecimentos` - Criar estabelecimento
--   `PUT /api/estabelecimentos/:id` - Atualizar estabelecimento
--   `DELETE /api/estabelecimentos/:id` - Deletar estabelecimento
+-   `POST /api/auth/register` - Registrar cliente
+-   `POST /api/auth/register/estabelecimento` - Registrar estabelecimento
+-   `POST /api/auth/login` - Fazer login
 
-### Serviços
+### 👤 Usuários
 
--   `GET /api/estabelecimentos/:id/servicos` - Listar serviços de um
+-   `GET /api/usuarios/:id` - Buscar usuário
+-   `PATCH /api/usuarios/:id` - Atualizar dados
+
+### 🏢 Estabelecimentos
+
+-   `GET /api/estabelecimentos` - Listar todos (busca: `?search=`)
+-   `GET /api/estabelecimentos/:id` - Detalhes do estabelecimento
+-   `GET /api/estabelecimentos/:id/servicos` - Serviços do estabelecimento
+-   `GET /api/estabelecimentos/:id/profissionais` - Profissionais do
     estabelecimento
+
+### 💼 Serviços (requer token de estabelecimento)
+
 -   `POST /api/servicos` - Criar serviço
--   `PUT /api/servicos/:id` - Atualizar serviço
+-   `GET /api/servicos/:id` - Detalhes do serviço
+-   `PATCH /api/servicos/:id` - Atualizar serviço
 -   `DELETE /api/servicos/:id` - Deletar serviço
 
-### Profissionais
+### 📅 Agendamentos (requer token de cliente)
 
--   `GET /api/estabelecimentos/:id/profissionais` - Listar profissionais de um
-    estabelecimento
--   `POST /api/profissionais` - Criar profissional
--   `PUT /api/profissionais/:id` - Atualizar profissional
--   `DELETE /api/profissionais/:id` - Deletar profissional
-
-### Agendamentos
-
--   `GET /api/agendamentos?usuarioId=xxx` - Listar agendamentos de um usuário
 -   `POST /api/agendamentos` - Criar agendamento
--   `PATCH /api/agendamentos/:id` - Atualizar status do agendamento
--   `DELETE /api/agendamentos/:id` - Deletar agendamento
+-   `GET /api/agendamentos` - Listar agendamentos do usuário
+-   `PATCH /api/agendamentos/:id` - Atualizar agendamento
+-   `DELETE /api/agendamentos/:id` - Cancelar agendamento
 
-### Usuário
+## 🧪 Testando a API
 
--   `GET /api/usuarios/:id` - Buscar dados do usuário
--   `PUT /api/usuarios/:id` - Atualizar dados do usuário
+Você pode testar os endpoints usando ferramentas como:
 
-### Transações
+-   **Postman** - https://www.postman.com/
+-   **Insomnia** - https://insomnia.rest/
+-   **Thunder Client** (extensão VS Code)
+-   **curl** (linha de comando)
 
--   `GET /api/transacoes?usuarioId=xxx` - Listar transações de um usuário
--   `POST /api/transacoes` - Criar transação
+### Exemplo com curl:
 
-### Métodos de Pagamento
+```bash
+# Registrar um cliente
+curl -X POST http://localhost:3001/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "João Silva",
+    "email": "joao@email.com",
+    "senha": "senha123",
+    "telefone": "11999999999"
+  }'
 
--   `GET /api/metodos-pagamento?usuarioId=xxx` - Listar métodos de pagamento
--   `POST /api/metodos-pagamento` - Criar método de pagamento
--   `DELETE /api/metodos-pagamento/:id` - Deletar método de pagamento
+# Fazer login
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "joao@email.com",
+    "senha": "senha123"
+  }'
 
-### Avaliações
+# Listar estabelecimentos
+curl http://localhost:3001/api/estabelecimentos
+```
 
--   `GET /api/avaliacoes?usuarioId=xxx` - Listar avaliações
--   `POST /api/avaliacoes` - Criar/Atualizar avaliação
+## 📚 Documentação Completa
 
-### Preferências de Notificação
+Para mais detalhes sobre todos os endpoints, schemas e validações, consulte:
 
--   `GET /api/preferencias-notificacao/:usuarioId` - Buscar preferências
--   `PUT /api/preferencias-notificacao/:usuarioId` - Atualizar preferências
+-   `docs/API_SPECIFICATION.md` - Especificação completa da API
 
-## 💡 Credenciais de Teste
+---
 
-**Cliente:**
-
--   Email: `cliente@exemplo.com`
--   Senha: `123456`
-
-**Estabelecimentos:**
-
--   Email: `contato@belezapura.com` / Senha: `123456`
--   Email: `contato@barberiapremium.com` / Senha: `123456`
--   Email: `contato@esteticaecia.com` / Senha: `123456`
-
-## ⚠️ Importante
-
-Esta é uma API de desenvolvimento. NÃO use em produção!
-
--   Senhas em texto plano
--   Sem validações complexas
--   Sem autenticação JWT real
--   Dados em memória (reiniciar = perder dados)
+✅ **Setup concluído!** A API está pronta para ser consumida pelo frontend.

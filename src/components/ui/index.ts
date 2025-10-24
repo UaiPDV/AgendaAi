@@ -16,3 +16,4 @@ export { AgendamentoCard } from './AgendamentoCard';
 export { ServicoCard } from './ServicoCard';
 export { LoadingSpinner } from './LoadingSpinner';
 export { ErrorMessage } from './ErrorMessage';
+export { ConfirmDialog } from './ConfirmDialog';

@@ -8,15 +8,31 @@ export const API_BASE_URL =
 export const API_ENDPOINTS = {
 	// Autenticação
 	AUTH_LOGIN: '/api/auth/login',
-	AUTH_REGISTER: '/api/auth/register',
+	AUTH_REGISTER_CLIENTE: '/api/auth/register',
+	AUTH_REGISTER_ESTABELECIMENTO: '/api/auth/register/estabelecimento',
 
 	// Estabelecimentos
 	ESTABELECIMENTOS: '/api/estabelecimentos',
-	ESTABELECIMENTO_BY_ID: (id: number) => `/api/estabelecimentos/${id}`,
-	ESTABELECIMENTO_SERVICOS: (id: number) =>
+	ESTABELECIMENTO_BY_ID: (id: number | string) =>
+		`/api/estabelecimentos/${id}`,
+	ESTABELECIMENTO_SERVICOS: (id: number | string) =>
 		`/api/estabelecimentos/${id}/servicos`,
-	ESTABELECIMENTO_PROFISSIONAIS: (id: number) =>
+	ESTABELECIMENTO_PROFISSIONAIS: (id: number | string) =>
 		`/api/estabelecimentos/${id}/profissionais`,
+	ESTABELECIMENTO_CLIENTES: (id: number | string) =>
+		`/api/estabelecimentos/${id}/clientes`,
+
+	// Serviços
+	SERVICOS: '/api/servicos',
+	SERVICO_BY_ID: (id: string) => `/api/servicos/${id}`,
+
+	// Profissionais
+	PROFISSIONAIS: '/api/profissionais',
+	PROFISSIONAL_BY_ID: (id: string) => `/api/profissionais/${id}`,
+
+	// Clientes
+	CLIENTES: '/api/clientes',
+	CLIENTE: (id: string) => `/api/clientes/${id}`,
 
 	// Agendamentos
 	AGENDAMENTOS: '/api/agendamentos',
@@ -42,24 +58,50 @@ export const API_ENDPOINTS = {
 } as const;
 
 /**
+ * Opções de requisição API
+ */
+interface ApiRequestOptions extends RequestInit {
+	token?: string;
+}
+
+/**
  * Helper para fazer requisições à API
  */
 export async function apiRequest<T>(
 	endpoint: string,
-	options?: RequestInit
+	options?: ApiRequestOptions
 ): Promise<T> {
 	const url = `${API_BASE_URL}${endpoint}`;
+	const { token, ...fetchOptions } = options || {};
+
+	const headers: Record<string, string> = {
+		'Content-Type': 'application/json',
+	};
+
+	// Adiciona headers adicionais
+	if (fetchOptions?.headers) {
+		const additionalHeaders = fetchOptions.headers as Record<
+			string,
+			string
+		>;
+		Object.assign(headers, additionalHeaders);
+	}
+
+	// Adiciona token de autenticação se fornecido
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`;
+	}
 
 	const response = await fetch(url, {
-		headers: {
-			'Content-Type': 'application/json',
-			...options?.headers,
-		},
-		...options,
+		...fetchOptions,
+		headers,
 	});
 
 	if (!response.ok) {
-		throw new Error(`API Error: ${response.statusText}`);
+		const error = await response.json().catch(() => ({
+			message: response.statusText,
+		}));
+		throw new Error(error.message || `API Error: ${response.statusText}`);
 	}
 
 	return response.json();

@@ -7,6 +7,7 @@ import {
 	SettingsButton,
 	Switch,
 	LanguageSelector,
+	LogoutButton,
 } from '@/components/ui';
 
 export default function ConfiguracoesEstabelecimentoPage() {
@@ -54,11 +55,12 @@ export default function ConfiguracoesEstabelecimentoPage() {
 
 				{/* Conta */}
 				<SettingsCard title="Conta">
-					<SettingsButton>Sair da Conta</SettingsButton>
-
-					<SettingsButton variant="danger">
-						Excluir Conta
-					</SettingsButton>
+					<div className="space-y-3">
+						<LogoutButton variant="danger" fullWidth />
+						<SettingsButton variant="danger">
+							Excluir Conta
+						</SettingsButton>
+					</div>
 				</SettingsCard>
 			</div>
 		</div>

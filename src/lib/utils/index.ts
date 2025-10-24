@@ -5,3 +5,5 @@ export * from './theme';
 export * from './sidebar';
 export * from './events';
 export * from './auth';
+export * from './formatters';
+export * from './validators';

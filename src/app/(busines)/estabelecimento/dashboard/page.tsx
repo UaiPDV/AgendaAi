@@ -19,12 +19,10 @@ import {
 	CalendarX,
 } from 'lucide-react';
 
-// ID do estabelecimento (em produção viria do contexto de autenticação)
-const ESTABELECIMENTO_ID = 1;
-
 export default function DashboardPage() {
+	// Hook obtém automaticamente o ID do estabelecimento logado
 	const { metrics, proximosAgendamentos, loading, error } =
-		useDashboardMetrics(ESTABELECIMENTO_ID);
+		useDashboardMetrics();
 
 	if (loading) {
 		return (

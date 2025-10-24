@@ -1,0 +1,1 @@
+export { DadosForm } from './DadosForm';

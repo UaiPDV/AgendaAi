@@ -1,134 +1,102 @@
+/**
+ * Página de Login
+ */
+
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { saveAuthToken } from '@/lib/utils';
-import type { LoginCredentials } from '@/types';
+import { useState } from 'react';
+import Link from 'next/link';
+import { LoginForm } from '@/components/features/auth';
+import { Logo } from '@/components/ui';
+import { useAuthentication } from '@/hooks/useAuthentication';
 
 export default function LoginPage() {
-	const router = useRouter();
-	const [credentials, setCredentials] = useState<LoginCredentials>({
-		email: '',
-		password: '',
-	});
-	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const { login, isLoading, error, clearError } = useAuthentication();
+	const [activeTab, setActiveTab] = useState<'cliente' | 'estabelecimento'>(
+		'cliente'
+	);
 
-	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		setIsLoading(true);
-		setError(null);
-
-		try {
-			// TODO: Substituir por chamada real à API
-			// const response = await fetch('/api/auth/login', {
-			// 	method: 'POST',
-			// 	headers: { 'Content-Type': 'application/json' },
-			// 	body: JSON.stringify(credentials),
-			// });
-
-			// if (!response.ok) {
-			// 	throw new Error('Credenciais inválidas');
-			// }
-
-			// const data = await response.json();
-			// saveAuthToken(data.token);
-
-			// Simulação temporária - remover em produção
-			const mockToken = 'mock-jwt-token-' + Date.now();
-			saveAuthToken(mockToken);
-
-			// Redirecionar para área autenticada
-			router.push('/Agendar');
-		} catch (err) {
-			setError(
-				err instanceof Error ? err.message : 'Erro ao fazer login'
-			);
-		} finally {
-			setIsLoading(false);
-		}
+	const handleLogin = async (credentials: {
+		email: string;
+		senha: string;
+	}) => {
+		clearError();
+		await login(credentials);
 	};
 
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950 px-4">
+		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
 			<div className="w-full max-w-md">
-				<div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8">
-					<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
-						Login
-					</h1>
-
-					<form onSubmit={handleSubmit} className="space-y-4">
-						<div>
-							<label
-								htmlFor="email"
-								className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-							>
-								E-mail
-							</label>
-							<input
-								id="email"
-								type="email"
-								required
-								value={credentials.email}
-								onChange={(e) =>
-									setCredentials((prev) => ({
-										...prev,
-										email: e.target.value,
-									}))
-								}
-								className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-								placeholder="seu@email.com"
-							/>
+				{/* Card de Login */}
+				<div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+					{/* Logo e Título */}
+					<div className="text-center mb-8">
+						<div className="flex justify-center mb-4">
+							<Logo size="lg" />
 						</div>
+						<h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+							Bem-vindo de volta!
+						</h1>
+						<p className="text-gray-600 dark:text-gray-400">
+							Faça login para continuar
+						</p>
+					</div>
 
-						<div>
-							<label
-								htmlFor="password"
-								className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-							>
-								Senha
-							</label>
-							<input
-								id="password"
-								type="password"
-								required
-								value={credentials.password}
-								onChange={(e) =>
-									setCredentials((prev) => ({
-										...prev,
-										password: e.target.value,
-									}))
-								}
-								className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-								placeholder="••••••••"
-							/>
-						</div>
-
-						{error && (
-							<div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
-								{error}
-							</div>
-						)}
-
+					{/* Tabs - Cliente / Estabelecimento */}
+					<div className="flex gap-2 mb-6 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
 						<button
-							type="submit"
-							disabled={isLoading}
-							className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+							type="button"
+							onClick={() => setActiveTab('cliente')}
+							className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+								activeTab === 'cliente'
+									? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
+									: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+							}`}
 						>
-							{isLoading ? 'Entrando...' : 'Entrar'}
+							Cliente
 						</button>
-					</form>
-
-					<p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-						Não tem uma conta?{' '}
-						<a
-							href="/Cadastro"
-							className="text-blue-600 dark:text-blue-400 hover:underline"
+						<button
+							type="button"
+							onClick={() => setActiveTab('estabelecimento')}
+							className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${
+								activeTab === 'estabelecimento'
+									? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
+									: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+							}`}
 						>
-							Cadastre-se
-						</a>
-					</p>
+							Estabelecimento
+						</button>
+					</div>
+
+					{/* Formulário de Login */}
+					<LoginForm
+						onSubmit={handleLogin}
+						isLoading={isLoading}
+						error={error}
+					/>
+
+					{/* Links de Cadastro */}
+					<div className="mt-6 text-center">
+						<p className="text-sm text-gray-600 dark:text-gray-400">
+							Não tem uma conta?{' '}
+							<Link
+								href={
+									activeTab === 'cliente'
+										? '/cadastro/cliente'
+										: '/cadastro/estabelecimento'
+								}
+								className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+							>
+								Cadastre-se
+							</Link>
+						</p>
+					</div>
 				</div>
+
+				{/* Footer */}
+				<p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
+					AgendaAi © 2025 - Todos os direitos reservados
+				</p>
 			</div>
 		</div>
 	);

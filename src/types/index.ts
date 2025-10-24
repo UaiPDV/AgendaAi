@@ -7,3 +7,4 @@ export * from './navigation';
 export * from './auth';
 export * from './cliente';
 export * from './estabelecimento';
+export * from './config';

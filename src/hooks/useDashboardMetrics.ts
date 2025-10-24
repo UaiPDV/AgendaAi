@@ -3,7 +3,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { apiRequest, API_ENDPOINTS } from '@/lib/api';
+import { getAgendamentos } from '@/lib/services/agendamento.service';
+import { getUserData } from '@/lib/utils/auth';
 import type {
 	DashboardMetrics,
 	AgendamentoListItem,
@@ -94,22 +95,28 @@ export function useDashboardMetrics(
 	};
 
 	const carregar = useCallback(async () => {
-		if (!estabelecimentoId) {
-			setLoading(false);
-			return;
+		// Se não tem estabelecimentoId, tenta obter do usuário logado
+		let estabId = estabelecimentoId;
+		if (!estabId) {
+			const user = getUserData();
+			if (user && user.tipo === 'estabelecimento') {
+				estabId = user.id as number;
+			} else {
+				setLoading(false);
+				setError('Estabelecimento não identificado');
+				return;
+			}
 		}
 
 		try {
 			setLoading(true);
 			setError(null);
 
-			const agendamentos = await apiRequest<Agendamento[]>(
-				API_ENDPOINTS.AGENDAMENTOS
-			);
+			const agendamentos = await getAgendamentos();
 
 			// Filtrar por estabelecimento
 			const agendamentosEstabelecimento = agendamentos.filter(
-				(a) => a.estabelecimentoId === estabelecimentoId
+				(a: Agendamento) => a.estabelecimentoId === estabId
 			);
 
 			// Calcular métricas
@@ -122,10 +129,11 @@ export function useDashboardMetrics(
 			const hoje = new Date();
 			const proximos = agendamentosEstabelecimento
 				.filter(
-					(a) => new Date(a.data) >= hoje && a.status !== 'cancelado'
+					(a: Agendamento) =>
+						new Date(a.data) >= hoje && a.status !== 'cancelado'
 				)
 				.sort(
-					(a, b) =>
+					(a: Agendamento, b: Agendamento) =>
 						new Date(a.data).getTime() - new Date(b.data).getTime()
 				)
 				.slice(0, 5);

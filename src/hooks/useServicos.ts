@@ -3,14 +3,21 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { apiRequest, API_ENDPOINTS } from '@/lib/api';
+import {
+	getServicosDoEstabelecimento,
+	createServico,
+	updateServico,
+	deleteServico,
+} from '@/lib/services/servico.service';
+import { getUserData } from '@/lib/utils/auth';
 import type {
 	ServicoDetalhado,
 	NovoServicoForm,
 } from '@/types/estabelecimento';
+import type { Servico } from '@/types';
 
 interface UseServicosReturn {
-	servicos: ServicoDetalhado[];
+	servicos: Servico[];
 	loading: boolean;
 	error: string | null;
 	criarServico: (data: NovoServicoForm) => Promise<void>;
@@ -23,23 +30,28 @@ interface UseServicosReturn {
 }
 
 export function useServicos(estabelecimentoId?: number): UseServicosReturn {
-	const [servicos, setServicos] = useState<ServicoDetalhado[]>([]);
+	const [servicos, setServicos] = useState<Servico[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	const carregar = useCallback(async () => {
-		if (!estabelecimentoId) {
-			setServicos([]);
-			setLoading(false);
-			return;
+		// Se não tem estabelecimentoId, tenta obter do usuário logado
+		let estabId = estabelecimentoId;
+		if (!estabId) {
+			const user = getUserData();
+			if (user && user.tipo === 'estabelecimento') {
+				estabId = user.id as number;
+			} else {
+				setServicos([]);
+				setLoading(false);
+				return;
+			}
 		}
 
 		try {
 			setLoading(true);
 			setError(null);
-			const data = await apiRequest<ServicoDetalhado[]>(
-				API_ENDPOINTS.ESTABELECIMENTO_SERVICOS(estabelecimentoId)
-			);
+			const data = await getServicosDoEstabelecimento(estabId);
 			setServicos(data);
 		} catch (err) {
 			setError(
@@ -57,16 +69,13 @@ export function useServicos(estabelecimentoId?: number): UseServicosReturn {
 
 	const criarServico = async (data: NovoServicoForm) => {
 		try {
-			await apiRequest(
-				API_ENDPOINTS.ESTABELECIMENTO_SERVICOS(estabelecimentoId!),
-				{
-					method: 'POST',
-					body: JSON.stringify({
-						...data,
-						estabelecimentoId,
-					}),
-				}
-			);
+			await createServico({
+				nome: data.nome,
+				descricao: data.descricao,
+				duracao: data.duracao,
+				preco: data.preco,
+				categoria: data.categoria,
+			});
 			await carregar();
 		} catch (err) {
 			throw new Error(
@@ -80,9 +89,12 @@ export function useServicos(estabelecimentoId?: number): UseServicosReturn {
 		data: Partial<NovoServicoForm>
 	) => {
 		try {
-			await apiRequest(`/api/servicos/${id}`, {
-				method: 'PUT',
-				body: JSON.stringify(data),
+			await updateServico(id, {
+				nome: data.nome,
+				descricao: data.descricao,
+				duracao: data.duracao,
+				preco: data.preco,
+				categoria: data.categoria,
 			});
 			await carregar();
 		} catch (err) {
@@ -94,9 +106,7 @@ export function useServicos(estabelecimentoId?: number): UseServicosReturn {
 
 	const excluirServico = async (id: string) => {
 		try {
-			await apiRequest(`/api/servicos/${id}`, {
-				method: 'DELETE',
-			});
+			await deleteServico(id);
 			await carregar();
 		} catch (err) {
 			throw new Error(

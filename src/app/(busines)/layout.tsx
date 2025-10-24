@@ -65,7 +65,7 @@ export default function BusinessLayout({
 							label="Clientes"
 						/>
 						<NavItem
-							href="/estabelecimento/configuracao"
+							href="/estabelecimento/config"
 							icon={Store}
 							label="Config. Estabelecimento"
 						/>

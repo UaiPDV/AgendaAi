@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { apiRequest, API_ENDPOINTS } from '@/lib/api';
+import { useState } from 'react';
+import { useServicos } from '@/hooks';
+import { LoadingSpinner, ConfirmDialog } from '@/components/ui';
 import type { Servico } from '@/types';
-import { LoadingSpinner } from '@/components/ui';
 import {
 	Briefcase,
 	Plus,
@@ -15,6 +15,7 @@ import {
 	Palette,
 	Heart,
 	Sparkles,
+	AlertCircle,
 } from 'lucide-react';
 
 // Ícones para categorias de serviços
@@ -27,9 +28,22 @@ const servicoIcons: Record<string, React.ReactNode> = {
 };
 
 export default function ServicosPage() {
-	const [servicos, setServicos] = useState<Servico[]>([]);
-	const [loading, setLoading] = useState(true);
+	const {
+		servicos,
+		loading,
+		error,
+		criarServico,
+		atualizarServico,
+		excluirServico,
+	} = useServicos();
+
 	const [showModal, setShowModal] = useState(false);
+	const [submitLoading, setSubmitLoading] = useState(false);
+	const [submitError, setSubmitError] = useState<string | null>(null);
+	const [editingServico, setEditingServico] = useState<Servico | null>(null);
+	const [servicoToDelete, setServicoToDelete] = useState<string | null>(null);
+	const [deleteLoading, setDeleteLoading] = useState(false);
+
 	const [formData, setFormData] = useState({
 		nome: '',
 		descricao: '',
@@ -37,47 +51,24 @@ export default function ServicosPage() {
 		preco: '',
 		categoria: 'corte',
 		ativo: true,
+		icone: 'briefcase',
 	});
-
-	useEffect(() => {
-		async function fetch() {
-			try {
-				const data = await apiRequest<Servico[]>(
-					API_ENDPOINTS.ESTABELECIMENTOS + '/1/servicos'
-				);
-				setServicos(data);
-			} catch (err) {
-				console.error(err);
-			} finally {
-				setLoading(false);
-			}
-		}
-		fetch();
-	}, []);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		setSubmitLoading(true);
+		setSubmitError(null);
+
 		try {
-			const payload = {
-				estabelecimentoId: 1,
-				...formData,
-			};
-			await apiRequest(
-				API_ENDPOINTS.AGENDAMENTOS.replace(
-					'/agendamentos',
-					'/servicos'
-				),
-				{
-					method: 'POST',
-					body: JSON.stringify(payload),
-				}
-			);
-			// Recarregar lista
-			const data = await apiRequest<Servico[]>(
-				API_ENDPOINTS.ESTABELECIMENTOS + '/1/servicos'
-			);
-			setServicos(data);
+			if (editingServico) {
+				// Atualizar serviço existente
+				await atualizarServico(editingServico.id, formData);
+			} else {
+				// Criar novo serviço
+				await criarServico(formData);
+			}
 			setShowModal(false);
+			setEditingServico(null);
 			setFormData({
 				nome: '',
 				descricao: '',
@@ -85,28 +76,83 @@ export default function ServicosPage() {
 				preco: '',
 				categoria: 'corte',
 				ativo: true,
+				icone: 'briefcase',
 			});
 		} catch (err) {
-			console.error(err);
+			setSubmitError(
+				err instanceof Error
+					? err.message
+					: `Erro ao ${
+							editingServico ? 'atualizar' : 'criar'
+					  } serviço`
+			);
+		} finally {
+			setSubmitLoading(false);
 		}
 	};
 
-	const handleEdit = (id: string) => {
-		console.log('Editar serviço:', id);
-		// TODO: Implementar edição
+	const handleEdit = (servico: Servico) => {
+		setEditingServico(servico);
+		setFormData({
+			nome: servico.nome,
+			descricao: servico.descricao || '',
+			duracao: servico.duracao || '',
+			preco: servico.preco || '',
+			categoria: 'corte',
+			ativo: true,
+			icone: 'briefcase',
+		});
+		setShowModal(true);
 	};
 
-	const handleDelete = async (id: string) => {
-		if (confirm('Tem certeza que deseja excluir este serviço?')) {
-			console.log('Excluir serviço:', id);
-			// TODO: Implementar exclusão
+	const handleDelete = (id: string) => {
+		setServicoToDelete(id);
+	};
+
+	const confirmDelete = async () => {
+		if (!servicoToDelete) return;
+
+		setDeleteLoading(true);
+		try {
+			await excluirServico(servicoToDelete);
+			setServicoToDelete(null);
+		} catch (err) {
+			alert(
+				err instanceof Error ? err.message : 'Erro ao excluir serviço'
+			);
+		} finally {
+			setDeleteLoading(false);
 		}
+	};
+
+	const handleCloseModal = () => {
+		setShowModal(false);
+		setEditingServico(null);
+		setSubmitError(null);
+		setFormData({
+			nome: '',
+			descricao: '',
+			duracao: '',
+			preco: '',
+			categoria: 'corte',
+			ativo: true,
+			icone: 'briefcase',
+		});
 	};
 
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center min-h-96">
 				<LoadingSpinner />
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-4 rounded-lg flex items-center gap-2">
+				<AlertCircle size={20} />
+				<span>{error}</span>
 			</div>
 		);
 	}
@@ -167,9 +213,7 @@ export default function ServicosPage() {
 									</div>
 									<div className="flex gap-2">
 										<button
-											onClick={() =>
-												handleEdit(servico.id)
-											}
+											onClick={() => handleEdit(servico)}
 											className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 p-1 transition-colors"
 											title="Editar"
 										>
@@ -229,17 +273,19 @@ export default function ServicosPage() {
 				</div>
 			)}
 
-			{/* Modal Novo Serviço */}
+			{/* Modal Novo/Editar Serviço */}
 			{showModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
 					<div className="bg-white dark:bg-gray-800 w-full max-w-lg rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
 						<div className="p-6">
 							<div className="flex justify-between items-center mb-6">
 								<h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-									Novo Serviço
+									{editingServico
+										? 'Editar Serviço'
+										: 'Novo Serviço'}
 								</h3>
 								<button
-									onClick={() => setShowModal(false)}
+									onClick={handleCloseModal}
 									className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
 								>
 									<Plus size={24} className="rotate-45" />
@@ -247,6 +293,13 @@ export default function ServicosPage() {
 							</div>
 
 							<form onSubmit={handleSubmit} className="space-y-4">
+								{submitError && (
+									<div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-3 rounded-lg flex items-center gap-2 text-sm">
+										<AlertCircle size={16} />
+										<span>{submitError}</span>
+									</div>
+								)}
+
 								<div>
 									<label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 										Nome do Serviço *
@@ -261,7 +314,8 @@ export default function ServicosPage() {
 											})
 										}
 										required
-										className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+										disabled={submitLoading}
+										className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
 										placeholder="Ex: Corte de Cabelo"
 									/>
 								</div>
@@ -279,7 +333,8 @@ export default function ServicosPage() {
 											})
 										}
 										rows={3}
-										className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+										disabled={submitLoading}
+										className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
 										placeholder="Descreva o serviço..."
 									/>
 								</div>
@@ -300,7 +355,8 @@ export default function ServicosPage() {
 											}
 											required
 											min="1"
-											className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+											disabled={submitLoading}
+											className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
 											placeholder="30"
 										/>
 									</div>
@@ -321,7 +377,8 @@ export default function ServicosPage() {
 											required
 											min="0"
 											step="0.01"
-											className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+											disabled={submitLoading}
+											className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
 											placeholder="50.00"
 										/>
 									</div>
@@ -339,7 +396,8 @@ export default function ServicosPage() {
 												categoria: e.target.value,
 											})
 										}
-										className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+										disabled={submitLoading}
+										className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										<option value="corte">Corte</option>
 										<option value="pintura">Pintura</option>
@@ -353,16 +411,31 @@ export default function ServicosPage() {
 								<div className="flex gap-3 pt-4">
 									<button
 										type="button"
-										onClick={() => setShowModal(false)}
-										className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+										onClick={handleCloseModal}
+										disabled={submitLoading}
+										className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 									>
 										Cancelar
 									</button>
 									<button
 										type="submit"
-										className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+										disabled={submitLoading}
+										className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
 									>
-										Salvar Serviço
+										{submitLoading ? (
+											<>
+												<LoadingSpinner />
+												{editingServico
+													? 'Atualizando...'
+													: 'Salvando...'}
+											</>
+										) : (
+											<>
+												{editingServico
+													? 'Atualizar Serviço'
+													: 'Salvar Serviço'}
+											</>
+										)}
 									</button>
 								</div>
 							</form>
@@ -370,6 +443,18 @@ export default function ServicosPage() {
 					</div>
 				</div>
 			)}
+
+			{/* Dialog de Confirmação de Exclusão */}
+			<ConfirmDialog
+				isOpen={servicoToDelete !== null}
+				onClose={() => setServicoToDelete(null)}
+				onConfirm={confirmDelete}
+				title="Excluir Serviço"
+				message="Tem certeza que deseja excluir este serviço? Esta ação não pode ser desfeita e removerá todos os agendamentos associados."
+				confirmText="Excluir"
+				type="danger"
+				isLoading={deleteLoading}
+			/>
 		</div>
 	);
 }

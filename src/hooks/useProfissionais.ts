@@ -3,14 +3,18 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { apiRequest, API_ENDPOINTS } from '@/lib/api';
-import type {
-	ProfissionalDetalhado,
-	NovoProfissionalForm,
-} from '@/types/estabelecimento';
+import {
+	getProfissionaisDoEstabelecimento,
+	createProfissional,
+	updateProfissional,
+	deleteProfissional,
+} from '@/lib/services/profissional.service';
+import { getUserData } from '@/lib/utils/auth';
+import type { NovoProfissionalForm } from '@/types/estabelecimento';
+import type { Profissional } from '@/types';
 
 interface UseProfissionaisReturn {
-	profissionais: ProfissionalDetalhado[];
+	profissionais: Profissional[];
 	loading: boolean;
 	error: string | null;
 	criarProfissional: (data: NovoProfissionalForm) => Promise<void>;
@@ -25,25 +29,28 @@ interface UseProfissionaisReturn {
 export function useProfissionais(
 	estabelecimentoId?: number
 ): UseProfissionaisReturn {
-	const [profissionais, setProfissionais] = useState<ProfissionalDetalhado[]>(
-		[]
-	);
+	const [profissionais, setProfissionais] = useState<Profissional[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	const carregar = useCallback(async () => {
-		if (!estabelecimentoId) {
-			setProfissionais([]);
-			setLoading(false);
-			return;
+		// Se não tem estabelecimentoId, tenta obter do usuário logado
+		let estabId = estabelecimentoId;
+		if (!estabId) {
+			const user = getUserData();
+			if (user && user.tipo === 'estabelecimento') {
+				estabId = user.id as number;
+			} else {
+				setProfissionais([]);
+				setLoading(false);
+				return;
+			}
 		}
 
 		try {
 			setLoading(true);
 			setError(null);
-			const data = await apiRequest<ProfissionalDetalhado[]>(
-				API_ENDPOINTS.ESTABELECIMENTO_PROFISSIONAIS(estabelecimentoId)
-			);
+			const data = await getProfissionaisDoEstabelecimento(estabId);
 			setProfissionais(data);
 		} catch (err) {
 			setError(
@@ -63,12 +70,10 @@ export function useProfissionais(
 
 	const criarProfissional = async (data: NovoProfissionalForm) => {
 		try {
-			await apiRequest('/api/profissionais', {
-				method: 'POST',
-				body: JSON.stringify({
-					...data,
-					estabelecimentoId,
-				}),
+			await createProfissional({
+				nome: data.nome,
+				telefone: data.telefone,
+				especialidades: data.especialidades,
 			});
 			await carregar();
 		} catch (err) {
@@ -85,9 +90,10 @@ export function useProfissionais(
 		data: Partial<NovoProfissionalForm>
 	) => {
 		try {
-			await apiRequest(`/api/profissionais/${id}`, {
-				method: 'PUT',
-				body: JSON.stringify(data),
+			await updateProfissional(id, {
+				nome: data.nome,
+				telefone: data.telefone,
+				especialidades: data.especialidades,
 			});
 			await carregar();
 		} catch (err) {
@@ -101,9 +107,7 @@ export function useProfissionais(
 
 	const excluirProfissional = async (id: string) => {
 		try {
-			await apiRequest(`/api/profissionais/${id}`, {
-				method: 'DELETE',
-			});
+			await deleteProfissional(id);
 			await carregar();
 		} catch (err) {
 			throw new Error(

@@ -20,7 +20,7 @@ export function AgendamentoCard({
 		servico,
 		profissional,
 		data,
-		hora,
+		horario,
 		preco,
 		status,
 	} = agendamento;
@@ -75,7 +75,7 @@ export function AgendamentoCard({
 					<Calendar className="w-4 h-4 text-gray-500" />
 					<span>{formatarData(data)}</span>
 					<Clock className="w-4 h-4 text-gray-500 ml-2" />
-					<span>{hora}</span>
+					<span>{horario || '—'}</span>
 				</div>
 
 				{/* Profissional */}

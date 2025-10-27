@@ -5,7 +5,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiRequest, API_ENDPOINTS } from '@/lib/api';
 import { getAuthToken } from '@/lib/utils/auth';
+import { transformAgendamentosAPI } from '@/lib/utils/transformers';
 import type { AgendamentoAPI } from '@/types/estabelecimento';
+import type { Agendamento } from '@/types/cliente';
 
 interface UseAgendamentosOptions {
 	usuarioId?: string;
@@ -14,7 +16,7 @@ interface UseAgendamentosOptions {
 }
 
 interface UseAgendamentosReturn {
-	agendamentos: AgendamentoAPI[];
+	agendamentos: Agendamento[];
 	loading: boolean;
 	error: string | null;
 	cancelarAgendamento: (id: string) => Promise<boolean>;
@@ -32,7 +34,7 @@ export function useAgendamentos(
 ): UseAgendamentosReturn {
 	const { usuarioId, estabelecimentoId, autoLoad = true } = options;
 
-	const [agendamentos, setAgendamentos] = useState<AgendamentoAPI[]>([]);
+	const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
 	const [loading, setLoading] = useState(autoLoad);
 	const [error, setError] = useState<string | null>(null);
 
@@ -83,7 +85,10 @@ export function useAgendamentos(
 					: [];
 			}
 
-			setAgendamentos(agendamentosData);
+			// Transforma AgendamentoAPI para Agendamento
+			const agendamentosTransformados =
+				transformAgendamentosAPI(agendamentosData);
+			setAgendamentos(agendamentosTransformados);
 		} catch (err) {
 			setError('Erro ao carregar agendamentos');
 			setAgendamentos([]); // Garante array vazio em caso de erro

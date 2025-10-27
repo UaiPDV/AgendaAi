@@ -15,6 +15,7 @@ import {
 	TrendingDown,
 	TrendingUp,
 	LineChart,
+	User,
 } from 'lucide-react';
 
 export default function MenuEstabelecimentoPage() {
@@ -295,6 +296,27 @@ export default function MenuEstabelecimentoPage() {
 						<ChevronRight className="w-5 h-5 text-gray-400" />
 					</Link>
 				</div>
+			</div>
+
+			{/* Link para Área do Cliente */}
+			<div className="mt-8 mb-6">
+				<Link
+					href="/Agendar"
+					className="block bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+				>
+					<div className="flex items-center">
+						<User className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3" />
+						<div className="flex-1">
+							<p className="font-semibold text-blue-900 dark:text-blue-200">
+								Área do Cliente
+							</p>
+							<p className="text-sm text-blue-700 dark:text-blue-300">
+								Agendar serviços
+							</p>
+						</div>
+						<ChevronRight className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+					</div>
+				</Link>
 			</div>
 		</div>
 	);

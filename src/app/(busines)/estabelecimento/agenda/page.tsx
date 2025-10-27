@@ -105,7 +105,7 @@ export default function AgendaPage() {
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 						{agendamentosHoje.map((agendamento) => {
 							const clienteInfo = getClienteInfo(
-								agendamento.usuario_id
+								agendamento.usuarioId
 							);
 							const isLoading = loadingAction === agendamento.id;
 
@@ -117,7 +117,7 @@ export default function AgendaPage() {
 									<div className="flex items-start justify-between mb-3">
 										<div className="flex-1">
 											<h4 className="font-semibold text-gray-800 dark:text-gray-100">
-												{agendamento.servico_nome_real}
+												{agendamento.servico}
 											</h4>
 											<p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
 												<Clock size={14} />
@@ -145,14 +145,14 @@ export default function AgendaPage() {
 											<span className="font-medium">
 												Profissional:
 											</span>{' '}
-											{agendamento.profissional_nome_real}
+											{agendamento.profissional}
 										</p>
 										<p className="text-gray-700 dark:text-gray-300 flex items-center gap-2">
 											<User size={14} />
 											<span className="font-medium">
 												Cliente:
 											</span>{' '}
-											{agendamento.usuario_nome ||
+											{agendamento.estabelecimento ||
 												'Cliente não identificado'}
 										</p>
 										{clienteInfo?.telefone && (
@@ -168,7 +168,10 @@ export default function AgendaPage() {
 
 									<div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
 										<p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-											R$ {agendamento.preco.toFixed(2)}
+											R${' '}
+											{parseFloat(
+												agendamento.preco
+											).toFixed(2)}
 										</p>
 									</div>
 
@@ -238,7 +241,7 @@ export default function AgendaPage() {
 					<div className="space-y-3">
 						{proximosAgendamentos.map((agendamento) => {
 							const clienteInfo = getClienteInfo(
-								agendamento.usuario_id
+								agendamento.usuarioId
 							);
 							const isLoading = loadingAction === agendamento.id;
 
@@ -252,9 +255,7 @@ export default function AgendaPage() {
 											<div className="flex items-start justify-between mb-2">
 												<div>
 													<h4 className="font-semibold text-gray-800 dark:text-gray-100">
-														{
-															agendamento.servico_nome_real
-														}
+														{agendamento.servico}
 													</h4>
 													<p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
 														<Calendar size={14} />
@@ -289,16 +290,14 @@ export default function AgendaPage() {
 													<span className="font-medium">
 														Prof:
 													</span>{' '}
-													{
-														agendamento.profissional_nome_real
-													}
+													{agendamento.profissional}
 												</p>
 												<p className="text-gray-700 dark:text-gray-300 flex items-center gap-2">
 													<User size={14} />
 													<span className="font-medium">
 														Cliente:
 													</span>{' '}
-													{agendamento.usuario_nome ||
+													{agendamento.estabelecimento ||
 														'N/A'}
 												</p>
 												{clienteInfo?.telefone && (
@@ -313,7 +312,9 @@ export default function AgendaPage() {
 										<div className="flex items-center gap-3">
 											<p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
 												R${' '}
-												{agendamento.preco.toFixed(2)}
+												{parseFloat(
+													agendamento.preco
+												).toFixed(2)}
 											</p>
 
 											{agendamento.status ===

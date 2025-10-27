@@ -64,7 +64,7 @@ export default function HistoricoPage() {
 		).length;
 		const totalFaturado = historico
 			.filter((a) => a.status === 'concluido')
-			.reduce((acc, a) => acc + a.preco, 0);
+			.reduce((acc, a) => acc + parseFloat(a.preco), 0);
 
 		return { concluidos, cancelados, totalFaturado };
 	}, [historico]);
@@ -193,7 +193,7 @@ export default function HistoricoPage() {
 									<div className="flex items-start justify-between mb-2">
 										<div>
 											<h4 className="font-semibold text-gray-800 dark:text-gray-100">
-												{agendamento.servico_nome_real}
+												{agendamento.servico}
 											</h4>
 											<p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
 												<Calendar size={14} />
@@ -223,21 +223,24 @@ export default function HistoricoPage() {
 											<span className="font-medium">
 												Profissional:
 											</span>{' '}
-											{agendamento.profissional_nome_real}
+											{agendamento.profissional}
 										</p>
 										<p className="text-gray-700 dark:text-gray-300 flex items-center gap-2">
 											<User size={14} />
 											<span className="font-medium">
 												Cliente:
 											</span>{' '}
-											{agendamento.usuario_nome}
+											{agendamento.estabelecimento ||
+												'Cliente'}
 										</p>
 									</div>
 								</div>
 
 								<div className="text-right">
 									<p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-										{formatarMoeda(agendamento.preco)}
+										{formatarMoeda(
+											parseFloat(agendamento.preco)
+										)}
 									</p>
 								</div>
 							</div>

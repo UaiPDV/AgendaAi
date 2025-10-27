@@ -128,15 +128,18 @@ export default function FinanceiroPage() {
 							>
 								<div className="flex-1">
 									<p className="font-medium text-gray-800 dark:text-gray-200">
-										{agendamento.servico_nome_real}
+										{agendamento.servico}
 									</p>
 									<p className="text-sm text-gray-500 dark:text-gray-400">
-										{agendamento.usuario_nome} -{' '}
-										{formatarDataHora(agendamento.data)}
+										{agendamento.estabelecimento ||
+											'Cliente'}{' '}
+										- {formatarDataHora(agendamento.data)}
 									</p>
 								</div>
 								<span className="font-semibold text-green-600 self-start sm:self-center">
-									{formatarMoeda(agendamento.preco)}
+									{formatarMoeda(
+										parseFloat(agendamento.preco)
+									)}
 								</span>
 							</div>
 						))
@@ -192,13 +195,16 @@ export default function FinanceiroPage() {
 											{formatarData(agendamento.data)}
 										</td>
 										<td className="p-4 text-sm text-gray-800 dark:text-gray-200">
-											{agendamento.servico_nome_real}
+											{agendamento.servico}
 										</td>
 										<td className="p-4 text-sm text-gray-800 dark:text-gray-200">
-											{agendamento.usuario_nome}
+											{agendamento.estabelecimento ||
+												'Cliente'}
 										</td>
 										<td className="p-4 text-sm text-right font-semibold text-green-600">
-											{formatarMoeda(agendamento.preco)}
+											{formatarMoeda(
+												parseFloat(agendamento.preco)
+											)}
 										</td>
 									</tr>
 								))

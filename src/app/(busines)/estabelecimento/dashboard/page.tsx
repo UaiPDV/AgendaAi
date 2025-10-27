@@ -5,7 +5,12 @@
 
 'use client';
 
-import { useDashboardMetrics } from '@/hooks';
+import {
+	useDashboardMetrics,
+	useServicos,
+	useProfissionais,
+	useClientes,
+} from '@/hooks';
 import { LoadingSpinner } from '@/components/ui';
 import {
 	Calendar,
@@ -20,9 +25,22 @@ import {
 } from 'lucide-react';
 
 export default function DashboardPage() {
-	// Hook obtém automaticamente o ID do estabelecimento logado
-	const { metrics, proximosAgendamentos, loading, error } =
-		useDashboardMetrics();
+	// Hooks para buscar dados reais da API
+	const {
+		metrics,
+		proximosAgendamentos,
+		loading: loadingMetrics,
+		error: errorMetrics,
+	} = useDashboardMetrics();
+	const { servicos, loading: loadingServicos } = useServicos();
+	const { profissionais, loading: loadingProfissionais } = useProfissionais();
+	const { clientes, loading: loadingClientes } = useClientes();
+
+	const loading =
+		loadingMetrics ||
+		loadingServicos ||
+		loadingProfissionais ||
+		loadingClientes;
 
 	if (loading) {
 		return (
@@ -32,14 +50,17 @@ export default function DashboardPage() {
 		);
 	}
 
-	if (error) {
+	if (errorMetrics) {
 		return (
 			<div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-4 rounded-lg">
 				<i className="fas fa-exclamation-circle mr-2"></i>
-				{error}
+				{errorMetrics}
 			</div>
 		);
 	}
+
+	// Total de serviços
+	const servicosAtivos = servicos.length;
 
 	return (
 		<div className="space-y-6 sm:space-y-8">
@@ -86,7 +107,7 @@ export default function DashboardPage() {
 								{metrics.agendamentosSemana}
 							</h4>
 							<p className="text-xs text-green-600 dark:text-green-400 mt-1">
-								+12% vs semana passada
+								Esta semana
 							</p>
 						</div>
 						<div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-500 rounded-lg flex items-center justify-center">
@@ -106,7 +127,7 @@ export default function DashboardPage() {
 								R$ {metrics.receitaMes.toFixed(2)}
 							</h4>
 							<p className="text-xs text-green-600 dark:text-green-400 mt-1">
-								+8% vs mês passado
+								Mês atual
 							</p>
 						</div>
 						<div className="w-12 h-12 sm:w-14 sm:h-14 bg-yellow-500 rounded-lg flex items-center justify-center">
@@ -191,10 +212,12 @@ export default function DashboardPage() {
 									</div>
 									<div className="flex-1 min-w-0">
 										<p className="font-medium text-gray-800 dark:text-gray-100 truncate">
-											{agendamento.servico || 'Serviço'}
+											{agendamento.servico}
 										</p>
 										<p className="text-sm text-gray-500 dark:text-gray-400">
-											{agendamento.data}{' '}
+											{new Date(
+												agendamento.data
+											).toLocaleDateString('pt-BR')}{' '}
 											{agendamento.horario &&
 												`às ${agendamento.horario}`}
 										</p>
@@ -231,7 +254,7 @@ export default function DashboardPage() {
 								Serviços Ativos
 							</p>
 							<h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">
-								12
+								{servicosAtivos}
 							</h4>
 							<p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
 								Disponíveis para agendamento
@@ -250,10 +273,10 @@ export default function DashboardPage() {
 								Profissionais
 							</p>
 							<h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">
-								8
+								{profissionais.length}
 							</h4>
 							<p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-								Ativos no momento
+								Cadastrados
 							</p>
 						</div>
 						<div className="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center">
@@ -269,10 +292,10 @@ export default function DashboardPage() {
 								Total Clientes
 							</p>
 							<h4 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">
-								248
+								{clientes.length}
 							</h4>
-							<p className="text-xs text-green-600 dark:text-green-400 mt-1">
-								+15 este mês
+							<p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+								Cadastrados
 							</p>
 						</div>
 						<div className="w-12 h-12 bg-pink-500 rounded-lg flex items-center justify-center">

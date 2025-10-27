@@ -15,10 +15,13 @@ import {
 	Users,
 	UserCheck,
 	Store,
-	DollarSign,
 	BarChart3,
 	Settings,
 	User,
+	Package,
+	TrendingDown,
+	TrendingUp,
+	LineChart,
 } from 'lucide-react';
 
 export default function BusinessLayout({
@@ -55,6 +58,11 @@ export default function BusinessLayout({
 							label="Serviços"
 						/>
 						<NavItem
+							href="/estabelecimento/produtos"
+							icon={Package}
+							label="Produtos"
+						/>
+						<NavItem
 							href="/estabelecimento/profissionais"
 							icon={Users}
 							label="Profissionais"
@@ -71,20 +79,28 @@ export default function BusinessLayout({
 						/>
 					</NavSection>
 
-					<NavSection title="Financeiro">
-						<NavItem
-							href="/estabelecimento/financeiro"
-							icon={DollarSign}
-							label="Ganhos"
-						/>
-						<NavItem
-							href="/estabelecimento/relatorios"
-							icon={BarChart3}
-							label="Relatórios"
-						/>
-					</NavSection>
-
-					<NavSection title="Outros">
+				<NavSection title="Financeiro">
+					<NavItem
+						href="/estabelecimento/contas-receber"
+						icon={TrendingUp}
+						label="Receitas"
+					/>
+					<NavItem
+						href="/estabelecimento/contas-pagar"
+						icon={TrendingDown}
+						label="Despesas"
+					/>
+					<NavItem
+						href="/estabelecimento/financeiro"
+						icon={LineChart}
+						label="Receita vs Despesa"
+					/>
+					<NavItem
+						href="/estabelecimento/relatorios"
+						icon={BarChart3}
+						label="Relatórios"
+					/>
+				</NavSection>					<NavSection title="Outros">
 						<NavItem
 							href="/estabelecimento/configuracoes"
 							icon={Settings}

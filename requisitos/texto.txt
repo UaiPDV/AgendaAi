@@ -1,0 +1,26 @@
+º Salões de beleza e esmalterias Foco
+º Academias e estúdios
+º Médicos e dentistas
+º Clínicas de estética e massagistas Foco
+º Salões de festa Foco
+º Estúdios de música
+º Psicólogos e terapeutas
+º Consultoria e coaching
+º Oficinas e concessionárias
+º Cursos e aulas 
+º Quadras esportivas
+º Aluguel de equipamentos
+
+Formulários Importantes:
+º Configurações 
+- Agenda
+- Usuário
+- Fiscal
+- Empresa
+º Cadastro Produtos
+º Cadastro Serviços
+º Financeiro 
+     - Contas a Pagar 
+     - Contas a Receber
+
+Entre outros que estão no documento enviado.

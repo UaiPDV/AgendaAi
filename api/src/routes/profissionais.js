@@ -5,7 +5,7 @@ import { openDb } from '../database.js';
 
 const router = Router();
 
-// Protege todas as rotas de profissionais (CUD)
+// Protege todas as rotas de profissionais (CUD) - GET é público via /estabelecimentos/:id/profissionais
 router.use(authenticateToken);
 router.use(isEstabelecimento);
 
@@ -14,28 +14,42 @@ router.use(isEstabelecimento);
  * Cria um novo profissional para o estabelecimento logado.
  */
 router.post('/', async (req, res) => {
-	const { nome, telefone, especialidades } = req.body;
+	// Adiciona horario_entrada, horario_saida, dias_trabalho
+	const {
+		nome,
+		telefone,
+		especialidades,
+		horario_entrada,
+		horario_saida,
+		dias_trabalho,
+	} = req.body;
 	const estabelecimentoId = req.user.id;
 
 	if (!nome) {
 		return res.status(400).json({ message: 'Nome é obrigatório.' });
 	}
 
-	// Converte array de especialidades em string JSON para salvar no SQLite
 	const especialidadesJSON = JSON.stringify(especialidades || []);
+	// Garante que dias_trabalho seja um array JSON, mesmo que venha vazio ou nulo
+	const diasTrabalhoJSON = JSON.stringify(
+		Array.isArray(dias_trabalho) ? dias_trabalho : []
+	);
 	const profissionalId = uuidv4();
 
 	let db;
 	try {
 		db = await openDb();
 		await db.run(
-			'INSERT INTO profissionais (id, estabelecimento_id, nome, telefone, especialidades) VALUES (?, ?, ?, ?, ?)',
+			'INSERT INTO profissionais (id, estabelecimento_id, nome, telefone, especialidades, horario_entrada, horario_saida, dias_trabalho) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
 			[
 				profissionalId,
 				estabelecimentoId,
 				nome,
-				telefone,
+				telefone || null,
 				especialidadesJSON,
+				horario_entrada || null,
+				horario_saida || null,
+				diasTrabalhoJSON,
 			]
 		);
 
@@ -43,9 +57,12 @@ router.post('/', async (req, res) => {
 			'SELECT * FROM profissionais WHERE id = ?',
 			[profissionalId]
 		);
-		// Converte de volta para array
+		// Converte JSON de volta para array
 		novoProfissional.especialidades = JSON.parse(
 			novoProfissional.especialidades
+		);
+		novoProfissional.dias_trabalho = JSON.parse(
+			novoProfissional.dias_trabalho
 		);
 
 		res.status(201).json(novoProfissional);
@@ -64,11 +81,17 @@ router.post('/', async (req, res) => {
  * Atualiza um profissional.
  */
 router.put('/:id', async (req, res) => {
-	const { nome, telefone, especialidades } = req.body;
+	// Adiciona horario_entrada, horario_saida, dias_trabalho
+	const {
+		nome,
+		telefone,
+		especialidades,
+		horario_entrada,
+		horario_saida,
+		dias_trabalho,
+	} = req.body;
 	const { id } = req.params;
 	const estabelecimentoId = req.user.id;
-
-	const especialidadesJSON = JSON.stringify(especialidades || []);
 
 	let db;
 	try {
@@ -78,26 +101,70 @@ router.put('/:id', async (req, res) => {
 			[id, estabelecimentoId]
 		);
 		if (!profissional) {
-			return res
-				.status(404)
-				.json({
-					message:
-						'Profissional não encontrado ou não pertence a este estabelecimento.',
-				});
+			return res.status(404).json({
+				message:
+					'Profissional não encontrado ou não pertence a este estabelecimento.',
+			});
 		}
 
+		// Atualiza apenas os campos fornecidos
+		const fieldsToUpdate = [];
+		const params = [];
+
+		if (nome !== undefined) {
+			fieldsToUpdate.push('nome = ?');
+			params.push(nome);
+		}
+		if (telefone !== undefined) {
+			fieldsToUpdate.push('telefone = ?');
+			params.push(telefone);
+		}
+		if (especialidades !== undefined) {
+			fieldsToUpdate.push('especialidades = ?');
+			params.push(JSON.stringify(especialidades || []));
+		}
+		if (horario_entrada !== undefined) {
+			fieldsToUpdate.push('horario_entrada = ?');
+			params.push(horario_entrada);
+		}
+		if (horario_saida !== undefined) {
+			fieldsToUpdate.push('horario_saida = ?');
+			params.push(horario_saida);
+		}
+		if (dias_trabalho !== undefined) {
+			fieldsToUpdate.push('dias_trabalho = ?');
+			params.push(
+				JSON.stringify(
+					Array.isArray(dias_trabalho) ? dias_trabalho : []
+				)
+			);
+		}
+
+		if (fieldsToUpdate.length === 0) {
+			return res
+				.status(400)
+				.json({ message: 'Nenhum campo fornecido para atualização.' });
+		}
+
+		fieldsToUpdate.push('updated_at = CURRENT_TIMESTAMP');
+		params.push(id); // For WHERE clause
+
 		await db.run(
-			'UPDATE profissionais SET nome = ?, telefone = ?, especialidades = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-			[nome, telefone, especialidadesJSON, id]
+			`UPDATE profissionais SET ${fieldsToUpdate.join(
+				', '
+			)} WHERE id = ?`,
+			params
 		);
 
 		const profAtualizado = await db.get(
 			'SELECT * FROM profissionais WHERE id = ?',
 			[id]
 		);
+		// Converte JSON de volta para array
 		profAtualizado.especialidades = JSON.parse(
 			profAtualizado.especialidades
 		);
+		profAtualizado.dias_trabalho = JSON.parse(profAtualizado.dias_trabalho);
 
 		res.status(200).json(profAtualizado);
 	} catch (error) {
@@ -126,18 +193,25 @@ router.delete('/:id', async (req, res) => {
 			[id, estabelecimentoId]
 		);
 		if (!profissional) {
-			return res
-				.status(404)
-				.json({
-					message:
-						'Profissional não encontrado ou não pertence a este estabelecimento.',
-				});
+			return res.status(404).json({
+				message:
+					'Profissional não encontrado ou não pertence a este estabelecimento.',
+			});
 		}
 
 		await db.run('DELETE FROM profissionais WHERE id = ?', [id]);
 		res.status(200).json({ message: 'Profissional deletado com sucesso.' });
 	} catch (error) {
 		console.error('Erro ao deletar profissional:', error);
+		// Check for foreign key constraint error (if appointments exist for this professional)
+		if (error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
+			return res
+				.status(400)
+				.json({
+					message:
+						'Não é possível deletar o profissional pois existem agendamentos vinculados a ele.',
+				});
+		}
 		res.status(500).json({
 			message: 'Erro interno ao deletar profissional.',
 		});

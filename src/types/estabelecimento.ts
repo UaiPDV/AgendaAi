@@ -38,6 +38,26 @@ export interface AgendamentoListItem extends Agendamento {
 }
 
 /**
+ * Agendamento da API (com joins de nomes)
+ */
+export interface AgendamentoAPI {
+	id: string;
+	servico_id: string;
+	profissional_id: string;
+	data: string;
+	horario: string;
+	usuario_id: string;
+	estabelecimento_id: number;
+	preco: number;
+	status: 'confirmado' | 'pendente' | 'cancelado' | 'concluido';
+	usuario_nome: string;
+	profissional_nome_real: string;
+	servico_nome_real: string;
+	created_at?: string;
+	updated_at?: string;
+}
+
+/**
  * Profissional com informações completas
  */
 export interface ProfissionalDetalhado extends Profissional {

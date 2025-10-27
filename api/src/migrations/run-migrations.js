@@ -3,6 +3,11 @@
  */
 
 import { openDb } from '../database.js';
+import {
+	createProdutosTable,
+	createContasPagarTable,
+	createContasReceberTable,
+} from './create-financial-tables.js';
 
 async function runMigrations() {
 	console.log('🔄 Iniciando migrações...');
@@ -70,6 +75,19 @@ async function runMigrations() {
 		console.log(
 			'✅ Tabela configuracoes_estabelecimento criada com sucesso'
 		);
+
+		// Novas migrações para módulo financeiro e produtos
+		console.log('📦 Criando tabela produtos...');
+		await createProdutosTable(db);
+		console.log('✅ Tabela produtos criada com sucesso');
+
+		console.log('📦 Criando tabela contas_pagar...');
+		await createContasPagarTable(db);
+		console.log('✅ Tabela contas_pagar criada com sucesso');
+
+		console.log('📦 Criando tabela contas_receber...');
+		await createContasReceberTable(db);
+		console.log('✅ Tabela contas_receber criada com sucesso');
 
 		console.log('✅ Todas as migrações concluídas!');
 	} catch (err) {

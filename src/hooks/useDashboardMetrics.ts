@@ -1,15 +1,15 @@
 /**
  * Hook para métricas do dashboard
+ * Consome dados da API /api/dashboard
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { getAgendamentos } from '@/lib/services/agendamento.service';
-import { getUserData } from '@/lib/utils/auth';
+import { apiRequest } from '@/lib/api';
+import { getAuthToken } from '@/lib/utils/auth';
 import type {
 	DashboardMetrics,
 	AgendamentoListItem,
 } from '@/types/estabelecimento';
-import type { Agendamento } from '@/types/cliente';
 
 interface UseDashboardMetricsReturn {
 	metrics: DashboardMetrics;
@@ -19,9 +19,26 @@ interface UseDashboardMetricsReturn {
 	recarregar: () => Promise<void>;
 }
 
-export function useDashboardMetrics(
-	estabelecimentoId?: number
-): UseDashboardMetricsReturn {
+interface DashboardApiResponse {
+	agendamentosHoje: number;
+	agendamentosSemana: number;
+	faturamentoHoje: number;
+	faturamentoMes: number;
+	clientesAtivos: number;
+	avaliacaoMedia: number;
+	proximosAgendamentos: Array<{
+		id: string;
+		data: string;
+		horario: string;
+		status: string;
+		servico: string;
+		profissional: string;
+		clienteNome: string;
+		preco: string;
+	}>;
+}
+
+export function useDashboardMetrics(): UseDashboardMetricsReturn {
 	const [metrics, setMetrics] = useState<DashboardMetrics>({
 		agendamentosHoje: 0,
 		agendamentosSemana: 0,
@@ -34,111 +51,53 @@ export function useDashboardMetrics(
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const calcularMetricas = (
-		agendamentos: Agendamento[]
-	): DashboardMetrics => {
-		const hoje = new Date();
-		hoje.setHours(0, 0, 0, 0);
-
-		const inicioSemana = new Date(hoje);
-		inicioSemana.setDate(hoje.getDate() - hoje.getDay());
-
-		const fimSemana = new Date(inicioSemana);
-		fimSemana.setDate(inicioSemana.getDate() + 7);
-
-		const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-		const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
-
-		let agendamentosHoje = 0;
-		let agendamentosSemana = 0;
-		let receitaMes = 0;
-		let totalMes = 0;
-		let canceladosMes = 0;
-
-		agendamentos.forEach((agendamento) => {
-			const dataAgendamento = new Date(agendamento.data);
-
-			// Hoje
-			if (dataAgendamento.toDateString() === hoje.toDateString()) {
-				agendamentosHoje++;
-			}
-
-			// Semana
-			if (
-				dataAgendamento >= inicioSemana &&
-				dataAgendamento < fimSemana
-			) {
-				agendamentosSemana++;
-			}
-
-			// Mês
-			if (dataAgendamento >= inicioMes && dataAgendamento <= fimMes) {
-				totalMes++;
-				if (agendamento.status === 'cancelado') {
-					canceladosMes++;
-				}
-				if (agendamento.status === 'concluido') {
-					receitaMes += parseFloat(agendamento.preco || '0');
-				}
-			}
-		});
-
-		const taxaCancelamento =
-			totalMes > 0 ? (canceladosMes / totalMes) * 100 : 0;
-
-		return {
-			agendamentosHoje,
-			agendamentosSemana,
-			receitaMes,
-			taxaCancelamento,
-		};
-	};
-
 	const carregar = useCallback(async () => {
-		// Se não tem estabelecimentoId, tenta obter do usuário logado
-		let estabId = estabelecimentoId;
-		if (!estabId) {
-			const user = getUserData();
-			if (user && user.tipo === 'estabelecimento') {
-				estabId = user.id as number;
-			} else {
-				setLoading(false);
-				setError('Estabelecimento não identificado');
-				return;
-			}
-		}
-
 		try {
 			setLoading(true);
 			setError(null);
 
-			const agendamentos = await getAgendamentos();
+			const token = getAuthToken();
+			if (!token) {
+				throw new Error('Token de autenticação não encontrado');
+			}
 
-			// Filtrar por estabelecimento
-			const agendamentosEstabelecimento = agendamentos.filter(
-				(a: Agendamento) => a.estabelecimentoId === estabId
+			// Busca métricas do dashboard da API
+			const data = await apiRequest<DashboardApiResponse>(
+				'/api/dashboard/metrics',
+				{
+					method: 'GET',
+					token,
+				}
 			);
 
-			// Calcular métricas
-			const calculatedMetrics = calcularMetricas(
-				agendamentosEstabelecimento
-			);
-			setMetrics(calculatedMetrics);
+			// Atualiza as métricas
+			setMetrics({
+				agendamentosHoje: data.agendamentosHoje || 0,
+				agendamentosSemana: data.agendamentosSemana || 0,
+				receitaMes: data.faturamentoMes || 0,
+				taxaCancelamento: 0, // Será calculado pela API em futuras atualizações
+			});
 
-			// Próximos agendamentos (futuros, ordenados por data)
-			const hoje = new Date();
-			const proximos = agendamentosEstabelecimento
-				.filter(
-					(a: Agendamento) =>
-						new Date(a.data) >= hoje && a.status !== 'cancelado'
-				)
-				.sort(
-					(a: Agendamento, b: Agendamento) =>
-						new Date(a.data).getTime() - new Date(b.data).getTime()
-				)
-				.slice(0, 5);
+			// Atualiza próximos agendamentos (garante que sempre tenha valores e tipo correto)
+			const proximosComValoresPadrao: AgendamentoListItem[] = (
+				data.proximosAgendamentos || []
+			).map((agendamento) => ({
+				id: agendamento.id,
+				data: agendamento.data,
+				horario: agendamento.horario,
+				status: agendamento.status as
+					| 'confirmado'
+					| 'pendente'
+					| 'cancelado'
+					| 'concluido',
+				servico: agendamento.servico || 'Serviço não definido',
+				profissional:
+					agendamento.profissional || 'Profissional não definido',
+				clienteNome: agendamento.clienteNome || 'Cliente',
+				preco: agendamento.preco || '0',
+			}));
 
-			setProximosAgendamentos(proximos);
+			setProximosAgendamentos(proximosComValoresPadrao);
 		} catch (err) {
 			setError(
 				err instanceof Error ? err.message : 'Erro ao carregar métricas'
@@ -147,7 +106,7 @@ export function useDashboardMetrics(
 		} finally {
 			setLoading(false);
 		}
-	}, [estabelecimentoId]);
+	}, []);
 
 	useEffect(() => {
 		carregar();

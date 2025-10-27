@@ -67,7 +67,7 @@ export function EstabelecimentoCard({
 				<div className="flex items-center gap-1 mb-3">
 					<Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
 					<span className="text-sm font-medium text-gray-900 dark:text-white">
-						{avaliacao.toFixed(1)}
+						{avaliacao ? avaliacao.toFixed(1) : '0.0'}
 					</span>
 				</div>
 

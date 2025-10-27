@@ -7,11 +7,14 @@ import {
 	Users,
 	UserCog,
 	Store,
-	DollarSign,
 	BarChart3,
 	Settings,
 	ChevronRight,
 	Home,
+	Package,
+	TrendingDown,
+	TrendingUp,
+	LineChart,
 } from 'lucide-react';
 
 export default function MenuEstabelecimentoPage() {
@@ -113,6 +116,24 @@ export default function MenuEstabelecimentoPage() {
 					</Link>
 
 					<Link
+						href="/estabelecimento/produtos"
+						className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+					>
+						<div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mr-3">
+							<Package className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+						</div>
+						<div className="flex-1">
+							<p className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">
+								Produtos
+							</p>
+							<p className="text-xs text-gray-500 dark:text-gray-400">
+								Gerencie seus produtos
+							</p>
+						</div>
+						<ChevronRight className="w-5 h-5 text-gray-400" />
+					</Link>
+
+					<Link
 						href="/estabelecimento/profissionais"
 						className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 					>
@@ -149,7 +170,7 @@ export default function MenuEstabelecimentoPage() {
 					</Link>
 
 					<Link
-						href="/estabelecimento/configuracao"
+						href="/estabelecimento/config"
 						className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 					>
 						<div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mr-3">
@@ -171,23 +192,59 @@ export default function MenuEstabelecimentoPage() {
 			{/* Financeiro */}
 			<div className="mt-8">
 				<h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-					<DollarSign className="w-5 h-5 text-gray-600 dark:text-gray-400 mr-2" />
+					<BarChart3 className="w-5 h-5 text-gray-600 dark:text-gray-400 mr-2" />
 					Financeiro
 				</h3>
 				<div className="space-y-2">
 					<Link
-						href="/estabelecimento/financeiro"
+						href="/estabelecimento/contas-receber"
 						className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 					>
 						<div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mr-3">
-							<DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
+							<TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
 						</div>
 						<div className="flex-1">
 							<p className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">
-								Ganhos
+								Receitas
 							</p>
 							<p className="text-xs text-gray-500 dark:text-gray-400">
-								Acompanhe seus ganhos
+								Contas a receber
+							</p>
+						</div>
+						<ChevronRight className="w-5 h-5 text-gray-400" />
+					</Link>
+
+					<Link
+						href="/estabelecimento/contas-pagar"
+						className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+					>
+						<div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mr-3">
+							<TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+						</div>
+						<div className="flex-1">
+							<p className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">
+								Despesas
+							</p>
+							<p className="text-xs text-gray-500 dark:text-gray-400">
+								Contas a pagar
+							</p>
+						</div>
+						<ChevronRight className="w-5 h-5 text-gray-400" />
+					</Link>
+
+					<Link
+						href="/estabelecimento/financeiro"
+						className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+					>
+						<div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-3">
+							<LineChart className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+						</div>
+						<div className="flex-1">
+							<p className="font-medium text-sm sm:text-base text-gray-900 dark:text-gray-100">
+								Receita vs Despesa
+							</p>
+							<p className="text-xs text-gray-500 dark:text-gray-400">
+								Comparação financeira
 							</p>
 						</div>
 						<ChevronRight className="w-5 h-5 text-gray-400" />

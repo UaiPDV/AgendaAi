@@ -14,8 +14,18 @@ interface EstabelecimentoCardProps {
 export function EstabelecimentoCard({
 	estabelecimento,
 }: EstabelecimentoCardProps) {
-	const { id, nome, endereco, avaliacao, imagem, horarioFuncionamento } =
-		estabelecimento;
+	const { id, nome, endereco, avaliacao, imagem } = estabelecimento;
+
+	// Some type definitions in the repo use camelCase (horarioFuncionamento)
+	// while others use snake_case (horario_funcionamento). Read both
+	// defensively to avoid TypeScript mismatches and runtime issues.
+	const _est = estabelecimento as unknown as Record<string, unknown>;
+	const horario =
+		typeof _est.horarioFuncionamento === 'string'
+			? (_est.horarioFuncionamento as string)
+			: typeof _est.horario_funcionamento === 'string'
+			? (_est.horario_funcionamento as string)
+			: 'Horário não disponível';
 
 	return (
 		<Link
@@ -44,6 +54,7 @@ export function EstabelecimentoCard({
 						display: none;
 					}
 				`}</style>
+				{/* eslint-disable-next-line @next/next/no-img-element */}
 				<img
 					src={imagem}
 					alt={nome}
@@ -83,7 +94,7 @@ export function EstabelecimentoCard({
 				<div className="flex items-center gap-2">
 					<Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
 					<p className="text-sm text-gray-600 dark:text-gray-400">
-						{horarioFuncionamento}
+						{horario}
 					</p>
 				</div>
 			</div>

@@ -21,7 +21,7 @@ export interface NovoClienteForm {
 /**
  * Dados para atualizar um cliente existente
  */
-export interface AtualizarClienteForm extends Partial<NovoClienteForm> {}
+export type AtualizarClienteForm = Partial<NovoClienteForm>;
 
 /**
  * Busca todos os clientes do estabelecimento logado

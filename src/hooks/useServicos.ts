@@ -10,10 +10,7 @@ import {
 	deleteServico,
 } from '@/lib/services/servico.service';
 import { getUserData } from '@/lib/utils/auth';
-import type {
-	ServicoDetalhado,
-	NovoServicoForm,
-} from '@/types/estabelecimento';
+import type { NovoServicoForm } from '@/types/estabelecimento';
 import type { Servico } from '@/types';
 
 interface UseServicosReturn {

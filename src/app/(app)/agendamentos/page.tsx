@@ -5,6 +5,8 @@
  * Refatorada com Clean Architecture
  */
 
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAgendamentos } from '@/hooks';
 import { useSuccessToast } from '@/hooks/useSuccessToast';
 import { useFilter, useFilteredData } from '@/hooks/useFilter';
@@ -17,10 +19,13 @@ import {
 import { Calendar } from 'lucide-react';
 import { AGENDAMENTO_STATUS } from '@/constants/app';
 
-export default function AgendamentosPage() {
+function AgendamentosContent() {
+	const searchParams = useSearchParams();
 	const { agendamentos, loading, error, cancelarAgendamento } =
 		useAgendamentos();
-	const { mostrarSucesso, setMostrarSucesso } = useSuccessToast();
+	const { mostrarSucesso, setMostrarSucesso } = useSuccessToast(
+		searchParams.get('sucesso')
+	);
 	const { filter, setFilter } = useFilter(AGENDAMENTO_STATUS.TODOS);
 	const agendamentosFiltrados = useFilteredData(agendamentos, filter);
 
@@ -66,5 +71,13 @@ export default function AgendamentosPage() {
 				/>
 			)}
 		</PageContainer>
+	);
+}
+
+export default function AgendamentosPage() {
+	return (
+		<Suspense fallback={<LoadingSpinner />}>
+			<AgendamentosContent />
+		</Suspense>
 	);
 }

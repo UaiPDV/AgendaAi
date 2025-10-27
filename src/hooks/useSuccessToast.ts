@@ -1,23 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 
 /**
- * Hook para gerenciar toast de sucesso com parâmetro de URL
+ * Hook para gerenciar toast de sucesso
+ * Para usar com parâmetros de URL, passe o valor do searchParam como argumento
  */
-export function useSuccessToast() {
-	const searchParams = useSearchParams();
-	const sucesso = searchParams.get('sucesso');
+export function useSuccessToast(sucessoParam?: string | null) {
 	const [mostrarSucesso, setMostrarSucesso] = useState(false);
 
 	useEffect(() => {
-		if (sucesso === 'true') {
+		if (sucessoParam === 'true') {
 			setMostrarSucesso(true);
 			const timer = setTimeout(() => {
 				setMostrarSucesso(false);
 			}, 5000);
 			return () => clearTimeout(timer);
 		}
-	}, [sucesso]);
+	}, [sucessoParam]);
 
 	return {
 		mostrarSucesso,

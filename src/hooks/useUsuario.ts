@@ -7,7 +7,9 @@ import { apiRequest, API_ENDPOINTS } from '@/lib/api';
 import { getAuthToken, getUserData } from '@/lib/utils/auth';
 import type { DadosUsuario, PreferenciasNotificacao } from '@/types';
 
-const normalizeDados = (dados: Partial<DadosUsuario> & { data_nascimento?: string }): DadosUsuario => ({
+const normalizeDados = (
+	dados: Partial<DadosUsuario> & { data_nascimento?: string }
+): DadosUsuario => ({
 	id: dados.id,
 	nome: dados.nome ?? '',
 	cpf: dados.cpf ?? '',

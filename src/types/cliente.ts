@@ -132,4 +132,6 @@ export interface DadosUsuario {
 	email: string;
 	telefone: string;
 	dataNascimento: string;
+	notif_lembretes?: boolean | number | null;
+	notif_promocoes?: boolean | number | null;
 }

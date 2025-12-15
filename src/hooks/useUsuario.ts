@@ -45,12 +45,8 @@ export function useUsuario() {
 			);
 
 			const preferencias: PreferenciasNotificacao = {
-				lembretes: Boolean(
-					(dadosUsuario as any).notif_lembretes ?? true
-				),
-				promocoes: Boolean(
-					(dadosUsuario as any).notif_promocoes ?? true
-				),
+				lembretes: Boolean(dadosUsuario.notif_lembretes ?? true),
+				promocoes: Boolean(dadosUsuario.notif_promocoes ?? true),
 				confirmacoes: true,
 			};
 
@@ -106,12 +102,8 @@ export function useUsuario() {
 				);
 
 				setPreferenciasNotificacao({
-					lembretes: Boolean(
-						(atualizadas as any).notif_lembretes ?? true
-					),
-					promocoes: Boolean(
-						(atualizadas as any).notif_promocoes ?? true
-					),
+					lembretes: Boolean(atualizadas.notif_lembretes ?? true),
+					promocoes: Boolean(atualizadas.notif_promocoes ?? true),
 					confirmacoes: true,
 				});
 				return true;

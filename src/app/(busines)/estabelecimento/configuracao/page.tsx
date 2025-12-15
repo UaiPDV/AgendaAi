@@ -5,6 +5,11 @@ import { apiRequest, API_ENDPOINTS } from '@/lib/api';
 import { getAuthToken } from '@/lib/utils/auth';
 import type { PreferenciasNotificacao } from '@/types/cliente';
 
+type NotificacaoResponse = {
+	notif_lembretes?: boolean | number | null;
+	notif_promocoes?: boolean | number | null;
+};
+
 export default function ConfiguracaoPage() {
 	const [prefs, setPrefs] = useState<PreferenciasNotificacao>({
 		lembretes: true,
@@ -21,7 +26,7 @@ export default function ConfiguracaoPage() {
 				return;
 			}
 			try {
-				const config = await apiRequest<any>(
+				const config = await apiRequest<NotificacaoResponse>(
 					API_ENDPOINTS.CONFIGURACOES_ME,
 					{ headers: { Authorization: `Bearer ${token}` } }
 				);

@@ -10,6 +10,72 @@ router.use(authenticateToken);
 router.use(isEstabelecimento);
 
 /**
+ * @openapi
+ * /api/servicos:
+ *   post:
+ *     tags: [Estabelecimento - Servicos]
+ *     summary: Cria um serviço para o estabelecimento logado
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nome, preco, duracao]
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               descricao:
+ *                 type: string
+ *               preco:
+ *                 type: number
+ *               duracao:
+ *                 type: integer
+ *               categoria:
+ *                 type: string
+ *               icone:
+ *                 type: string
+ *               ativo:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: Serviço criado
+ * /api/servicos/{id}:
+ *   put:
+ *     tags: [Estabelecimento - Servicos]
+ *     summary: Atualiza um serviço
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Serviço atualizado
+ *       404:
+ *         description: Serviço não encontrado
+ *   delete:
+ *     tags: [Estabelecimento - Servicos]
+ *     summary: Deleta um serviço
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Serviço removido
+ */
+
+/**
  * POST /api/servicos
  * Cria um novo serviço para o estabelecimento logado.
  */

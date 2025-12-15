@@ -7,6 +7,95 @@ import { openDb } from '../database.js';
 const router = Router();
 
 /**
+ * @openapi
+ * /api/auth/register:
+ *   post:
+ *     tags: [Auth - Cliente]
+ *     summary: Registra um novo cliente
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nome, email, senha]
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *               telefone:
+ *                 type: string
+ *               cpf:
+ *                 type: string
+ *               dataNascimento:
+ *                 type: string
+ *                 format: date
+ *     responses:
+ *       201:
+ *         description: Cliente registrado
+ *       400:
+ *         description: Dados inválidos ou já existentes
+ * /api/auth/register/estabelecimento:
+ *   post:
+ *     tags: [Auth - Estabelecimento]
+ *     summary: Registra um novo estabelecimento
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nome, email, senha]
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *               telefone:
+ *                 type: string
+ *               endereco:
+ *                 type: string
+ *               horarioFuncionamento:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Estabelecimento registrado
+ *       400:
+ *         description: Dados inválidos ou já existentes
+ * /api/auth/login:
+ *   post:
+ *     tags: [Auth - Cliente, Auth - Estabelecimento]
+ *     summary: Autentica cliente ou estabelecimento e retorna token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, senha, tipo]
+ *             properties:
+ *               email:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *               tipo:
+ *                 type: string
+ *                 enum: [cliente, estabelecimento]
+ *     responses:
+ *       200:
+ *         description: Login bem-sucedido com token
+ *       400:
+ *         description: Dados faltando ou tipo inválido
+ *       401:
+ *         description: Credenciais inválidas
+ */
+
+/**
  * Gera um token JWT para um usuário.
  */
 const generateToken = (user) => {
@@ -145,7 +234,13 @@ router.post('/register/estabelecimento', async (req, res) => {
  * Autentica um cliente ou um estabelecimento.
  */
 router.post('/login', async (req, res) => {
-	const { email, senha } = req.body;
+	const { email, senha, tipo } = req.body;
+
+	if (!tipo || (tipo !== 'cliente' && tipo !== 'estabelecimento')) {
+		return res
+			.status(400)
+			.json({ message: 'Tipo de login inválido (cliente ou estabelecimento).' });
+	}
 
 	if (!email || !senha) {
 		return res
@@ -157,28 +252,21 @@ router.post('/login', async (req, res) => {
 	try {
 		db = await openDb();
 		let user = null;
-		let tipo = null;
 
-		// 1. Tenta encontrar como cliente (usuário)
-		user = await db.get('SELECT * FROM usuarios WHERE email = ?', [email]);
-		if (user) {
-			tipo = 'cliente';
-		} else {
-			// 2. Se não for cliente, tenta encontrar como estabelecimento
+		if (tipo === 'cliente') {
+			user = await db.get('SELECT * FROM usuarios WHERE email = ?', [email]);
+		} else if (tipo === 'estabelecimento') {
 			user = await db.get(
-				'SELECT * FROM estabelecimentos WHERE email = ?',
+				' SELECT * FROM estabelecimentos WHERE email = ?',
 				[email]
 			);
-			if (user) {
-				tipo = 'estabelecimento';
-			}
 		}
 
-		// 3. Se não encontrou em nenhuma tabela
+		// 3. Se não encontrou no tipo selecionado
 		if (!user) {
 			return res
 				.status(401)
-				.json({ success: false, message: 'Credenciais inválidas.' });
+				.json({ success: false, message: 'Credenciais inválidas para este tipo de login.' });
 		}
 
 		// 4. Compara a senha

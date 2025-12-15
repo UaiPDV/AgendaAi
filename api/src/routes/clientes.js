@@ -11,6 +11,69 @@ import { openDb } from '../database.js';
 const router = Router();
 
 /**
+ * @openapi
+ * /api/clientes/{id}:
+ *   get:
+ *     tags: [Estabelecimento - Clientes]
+ *     summary: Busca cliente por ID
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Cliente retornado
+ *       404:
+ *         description: Não encontrado
+ *   put:
+ *     tags: [Estabelecimento - Clientes]
+ *     summary: Atualiza um cliente
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nome]
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               telefone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cliente atualizado
+ *   delete:
+ *     tags: [Estabelecimento - Clientes]
+ *     summary: Remove um cliente
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Cliente removido
+ */
+
+/**
  * GET /api/clientes/:id
  * Busca um cliente específico por ID
  */

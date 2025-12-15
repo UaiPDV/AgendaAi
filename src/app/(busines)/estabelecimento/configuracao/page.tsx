@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { apiRequest, API_ENDPOINTS } from '@/lib/api';
+import { getAuthToken } from '@/lib/utils/auth';
 import type { PreferenciasNotificacao } from '@/types/cliente';
 
 export default function ConfiguracaoPage() {
@@ -14,18 +15,21 @@ export default function ConfiguracaoPage() {
 
 	useEffect(() => {
 		async function fetch() {
+			const token = getAuthToken();
+			if (!token) {
+				setLoading(false);
+				return;
+			}
 			try {
-				// para dev usamos o primeiro usuário
-				const usuarios = await apiRequest<{ id?: string }[]>(
-					API_ENDPOINTS.USUARIOS
+				const config = await apiRequest<any>(
+					API_ENDPOINTS.CONFIGURACOES_ME,
+					{ headers: { Authorization: `Bearer ${token}` } }
 				);
-				const usuarioId = usuarios?.[0]?.id;
-				if (!usuarioId) return;
-
-				const serverPrefs = await apiRequest<PreferenciasNotificacao>(
-					API_ENDPOINTS.PREFERENCIAS_NOTIFICACAO(usuarioId)
-				);
-				setPrefs(serverPrefs);
+				setPrefs({
+					lembretes: Boolean(config?.notif_lembretes ?? true),
+					promocoes: Boolean(config?.notif_promocoes ?? true),
+					confirmacoes: true,
+				});
 			} catch (err) {
 				console.error(err);
 			} finally {
@@ -36,17 +40,19 @@ export default function ConfiguracaoPage() {
 	}, []);
 
 	async function save() {
+		const token = getAuthToken();
+		if (!token) return;
 		try {
-			const usuarios = await apiRequest<{ id?: string }[]>(
-				API_ENDPOINTS.USUARIOS
-			);
-			const usuarioId = usuarios?.[0]?.id;
-			if (!usuarioId) return;
-
-			await fetch(API_ENDPOINTS.PREFERENCIAS_NOTIFICACAO(usuarioId), {
+			await fetch(API_ENDPOINTS.USUARIO_ME, {
 				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(prefs),
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					notif_lembretes: prefs.lembretes,
+					notif_promocoes: prefs.promocoes,
+				}),
 			});
 			alert('Preferências salvas');
 		} catch (err) {

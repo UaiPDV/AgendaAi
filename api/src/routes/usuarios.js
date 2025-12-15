@@ -6,6 +6,146 @@ import { openDb } from '../database.js';
 const router = Router();
 
 /**
+ * @openapi
+ * /api/usuarios/me:
+ *   get:
+ *     tags: [Cliente - Perfil]
+ *     summary: Retorna dados do usuário logado (cliente ou estabelecimento)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dados do usuário
+ *       401:
+ *         description: Token ausente ou inválido
+ *   put:
+ *     tags: [Cliente - Perfil]
+ *     summary: Atualiza dados e preferências do cliente logado
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               telefone:
+ *                 type: string
+ *               dataNascimento:
+ *                 type: string
+ *                 format: date
+ *               notif_lembretes:
+ *                 type: boolean
+ *               notif_promocoes:
+ *                 type: boolean
+ *               pref_tema_escuro:
+ *                 type: boolean
+ *               pref_idioma:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Perfil atualizado
+ *       400:
+ *         description: Nenhum dado enviado
+ *   delete:
+ *     tags: [Cliente - Perfil, Estabelecimento - Perfil]
+ *     summary: Exclui a conta do usuário logado
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Conta excluída
+ *       401:
+ *         description: Token ausente ou inválido
+ * /api/usuarios/me/pagamentos:
+ *   get:
+ *     tags: [Cliente - Pagamentos]
+ *     summary: Lista formas de pagamento do cliente
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de pagamentos
+ *   post:
+ *     tags: [Cliente - Pagamentos]
+ *     summary: Cria uma forma de pagamento
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [tipo, descricao]
+ *             properties:
+ *               tipo:
+ *                 type: string
+ *                 enum: [credito, debito, pix]
+ *               descricao:
+ *                 type: string
+ *               token_gateway:
+ *                 type: string
+ *               principal:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: Forma de pagamento criada
+ * /api/usuarios/me/pagamentos/{id}:
+ *   put:
+ *     tags: [Cliente - Pagamentos]
+ *     summary: Atualiza uma forma de pagamento
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               descricao:
+ *                 type: string
+ *               principal:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Forma de pagamento atualizada
+ *   delete:
+ *     tags: [Cliente - Pagamentos]
+ *     summary: Remove uma forma de pagamento
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Removida com sucesso
+ * /api/usuarios/me/avaliacoes:
+ *   get:
+ *     tags: [Cliente - Avaliacoes]
+ *     summary: Lista avaliações feitas pelo cliente
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de avaliações
+ */
+
+/**
  * GET /api/usuarios/me
  * Busca os dados do usuário (cliente OU estabelecimento) logado.
  */

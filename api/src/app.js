@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import allRoutes from './routes/index.js';
 import { initDb } from './database.js';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './swagger.js';
 
 // Carrega variáveis de ambiente do arquivo .env
 dotenv.config();
@@ -15,12 +17,20 @@ const PORT = process.env.PORT || 3001;
 app.use(cors()); // Habilita o CORS para permitir requisições do frontend
 app.use(express.json()); // Habilita o parsing de JSON no corpo das requisições
 
+// Swagger UI
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Rota principal da API
 app.use('/api', allRoutes);
 
 // Rota de "saúde" para verificar se a API está online
-app.get('/', (req, res) => {
+app.get('/health', (req, res) => {
 	res.status(200).json({ message: 'API do AgendaAi está funcional!' });
+});
+
+// Redireciona raiz para a documentação
+app.get('/', (req, res) => {
+	res.redirect('/docs');
 });
 
 // Inicializa o servidor

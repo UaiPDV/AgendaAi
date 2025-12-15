@@ -8,6 +8,67 @@ router.use(authenticateToken);
 router.use(isEstabelecimento);
 
 /**
+ * @openapi
+ * /produtos:
+ *   get:
+ *     summary: Lista produtos do estabelecimento logado
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de produtos
+ *       401:
+ *         description: Token ausente ou inválido
+ *   post:
+ *     summary: Cria um produto
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               descricao:
+ *                 type: string
+ *               preco:
+ *                 type: number
+ *               categoria:
+ *                 type: string
+ *               estoque:
+ *                 type: integer
+ *               ativo:
+ *                 type: boolean
+ *             required: [nome, preco]
+ *     responses:
+ *       201:
+ *         description: Produto criado
+ *       400:
+ *         description: Dados inválidos
+ *       401:
+ *         description: Token ausente ou inválido
+ * /produtos/{id}:
+ *   get:
+ *     summary: Busca um produto por ID
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Produto retornado
+ *       404:
+ *         description: Produto não encontrado
+ */
+
+/**
  * GET /api/produtos
  * Lista todos os produtos do estabelecimento logado
  */

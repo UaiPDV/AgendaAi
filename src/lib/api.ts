@@ -11,6 +11,9 @@ export const API_ENDPOINTS = {
 	AUTH_REGISTER_CLIENTE: '/api/auth/register',
 	AUTH_REGISTER_ESTABELECIMENTO: '/api/auth/register/estabelecimento',
 
+	// Usuário logado
+	USUARIO_ME: '/api/usuarios/me',
+
 	// Estabelecimentos
 	ESTABELECIMENTOS: '/api/estabelecimentos',
 	ESTABELECIMENTO_BY_ID: (id: number | string) =>
@@ -41,20 +44,20 @@ export const API_ENDPOINTS = {
 	// Usuários
 	USUARIO_BY_ID: (id: string) => `/api/usuarios/${id}`,
 	USUARIOS: '/api/usuarios',
+	CONFIGURACOES_ME: '/api/configuracoes/me',
 
 	// Transações
 	TRANSACOES: '/api/transacoes',
 
-	// Métodos de Pagamento
-	METODOS_PAGAMENTO: '/api/metodos-pagamento',
-	METODO_PAGAMENTO_BY_ID: (id: string) => `/api/metodos-pagamento/${id}`,
+	// Métodos de Pagamento (cliente logado)
+	METODOS_PAGAMENTO: '/api/usuarios/me/pagamentos',
+	METODO_PAGAMENTO_BY_ID: (id: string) => `/api/usuarios/me/pagamentos/${id}`,
 
 	// Avaliações
 	AVALIACOES: '/api/avaliacoes',
+	AVALIACOES_ME: '/api/usuarios/me/avaliacoes',
 
 	// Preferências de Notificação
-	PREFERENCIAS_NOTIFICACAO: (usuarioId: string) =>
-		`/api/preferencias-notificacao/${usuarioId}`,
 } as const;
 
 /**

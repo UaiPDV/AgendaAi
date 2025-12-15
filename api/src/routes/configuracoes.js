@@ -5,6 +5,89 @@ import { authenticateToken } from '../middlewares/auth.js';
 const router = Router();
 
 /**
+ * @openapi
+ * /api/configuracoes/me:
+ *   get:
+ *     tags: [Estabelecimento - Configuracoes]
+ *     summary: Retorna configurações do estabelecimento logado
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Configurações retornadas
+ *       403:
+ *         description: Apenas estabelecimentos
+ *   put:
+ *     tags: [Estabelecimento - Configuracoes]
+ *     summary: Atualiza configurações do estabelecimento logado
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               padraoFuncionamento:
+ *                 type: string
+ *               diasTrabalho:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *               horarioAbertura:
+ *                 type: string
+ *               horarioFechamento:
+ *                 type: string
+ *               possuiIntervalo:
+ *                 type: boolean
+ *               intervaloInicio:
+ *                 type: string
+ *               intervaloFim:
+ *                 type: string
+ *               horariosIndividuaisAtivo:
+ *                 type: boolean
+ *               fecharFeriadosNacionais:
+ *                 type: boolean
+ *               fecharFeriadosMunicipais:
+ *                 type: boolean
+ *               feriadosPersonalizados:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               datasBloqueadas:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Datas em formato YYYY-MM-DD
+ *               duracaoPadrao:
+ *                 type: integer
+ *               antecedenciaMinima:
+ *                 type: integer
+ *               antecedenciaMinimaAtivo:
+ *                 type: boolean
+ *               limiteAgendamentosSimultaneos:
+ *                 type: integer
+ *               limiteAgendamentosAtivo:
+ *                 type: boolean
+ *               confirmacaoAutomatica:
+ *                 type: boolean
+ *               bufferEntreServicos:
+ *                 type: integer
+ *               bufferEntreServicosAtivo:
+ *                 type: boolean
+ *               cancelamentoAntecedencia:
+ *                 type: integer
+ *               cancelamentoAntecedenciaAtivo:
+ *                 type: boolean
+ *               reagendamentoPermitido:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Configurações atualizadas
+ */
+
+/**
  * GET /api/configuracoes/me
  * Busca as configurações do estabelecimento logado
  */

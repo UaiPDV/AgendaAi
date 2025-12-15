@@ -6,6 +6,155 @@ import { openDb } from '../database.js';
 const router = Router();
 
 /**
+ * @openapi
+ * /api/estabelecimentos:
+ *   get:
+ *     tags: [Publico - Estabelecimentos]
+ *     summary: Lista estabelecimentos com média de avaliações
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de estabelecimentos
+ * /api/estabelecimentos/me:
+ *   get:
+ *     tags: [Estabelecimento - Perfil]
+ *     summary: Busca dados do estabelecimento logado
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dados do estabelecimento
+ *       401:
+ *         description: Token inválido
+ *   put:
+ *     tags: [Estabelecimento - Perfil]
+ *     summary: Atualiza dados do estabelecimento logado
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               telefone:
+ *                 type: string
+ *               endereco:
+ *                 type: string
+ *               horarioFuncionamento:
+ *                 type: string
+ *               imagem:
+ *                 type: string
+ *               notif_novos_agendamentos:
+ *                 type: boolean
+ *               notif_resumo_diario:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Estabelecimento atualizado
+ *       400:
+ *         description: Nenhum dado enviado
+ * /api/estabelecimentos/{id}:
+ *   get:
+ *     tags: [Publico - Estabelecimentos]
+ *     summary: Busca estabelecimento por ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Dados do estabelecimento
+ *       404:
+ *         description: Não encontrado
+ * /api/estabelecimentos/{id}/servicos:
+ *   get:
+ *     tags: [Publico - Servicos]
+ *     summary: Lista serviços ativos de um estabelecimento
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de serviços
+ * /api/estabelecimentos/{id}/profissionais:
+ *   get:
+ *     tags: [Publico - Profissionais]
+ *     summary: Lista profissionais de um estabelecimento
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de profissionais
+ * /api/estabelecimentos/{id}/clientes:
+ *   get:
+ *     tags: [Estabelecimento - Clientes]
+ *     summary: Lista clientes do estabelecimento
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de clientes
+ *   post:
+ *     tags: [Estabelecimento - Clientes]
+ *     summary: Cria um cliente para o estabelecimento
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nome]
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               telefone:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Cliente criado
+ * /api/estabelecimentos/{id}/avaliacoes:
+ *   get:
+ *     tags: [Publico - Avaliacoes]
+ *     summary: Lista avaliações de um estabelecimento
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Lista de avaliações
+ */
+
+/**
  * GET /api/estabelecimentos
  * Lista todos os estabelecimentos. Público.
  */

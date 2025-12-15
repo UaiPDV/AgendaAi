@@ -10,17 +10,24 @@ import type { LoginCredentials } from '@/types';
 
 interface LoginFormProps {
 	onSubmit: (credentials: LoginCredentials) => Promise<void>;
+	userType: 'cliente' | 'estabelecimento';
 	isLoading?: boolean;
 	error?: string | null;
 }
 
-export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
+export function LoginForm({
+	onSubmit,
+	userType,
+	isLoading,
+	error,
+}: LoginFormProps) {
 	const [email, setEmail] = useState('');
 	const [senha, setSenha] = useState('');
+	const [showSenha, setShowSenha] = useState(false);
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		await onSubmit({ email, senha });
+		await onSubmit({ email, senha, tipo: userType });
 	};
 
 	return (
@@ -57,21 +64,33 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
 				>
 					Senha
 				</label>
-				<input
-					id="senha"
-					type="password"
-					value={senha}
-					onChange={(e) => setSenha(e.target.value)}
-					required
-					disabled={isLoading}
-					className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-						focus:ring-2 focus:ring-blue-500 focus:border-transparent
-						bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-						disabled:opacity-50 disabled:cursor-not-allowed
-						transition-colors"
-					placeholder="••••••••"
-					minLength={6}
-				/>
+				<div className="relative">
+					<input
+						id="senha"
+						type={showSenha ? 'text' : 'password'}
+						value={senha}
+						onChange={(e) => setSenha(e.target.value)}
+						required
+						disabled={isLoading}
+						className="w-full px-4 py-2 pr-24 border border-gray-300 dark:border-gray-600 rounded-lg 
+							focus:ring-2 focus:ring-blue-500 focus:border-transparent
+							bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+							disabled:opacity-50 disabled:cursor-not-allowed
+							transition-colors"
+						placeholder="••••••••"
+						minLength={6}
+					/>
+					<button
+						type="button"
+						onClick={() => setShowSenha((v) => !v)}
+						disabled={isLoading}
+						className="absolute inset-y-0 right-2 px-3 text-sm font-medium text-gray-600 dark:text-gray-300 
+							bg-transparent hover:text-gray-900 dark:hover:text-white disabled:opacity-50"
+						aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
+					>
+						{showSenha ? 'Ocultar' : 'Mostrar'}
+					</button>
+				</div>
 			</div>
 
 			{/* Mensagem de Erro */}

@@ -19,6 +19,7 @@ export default function LoginPage() {
 	const handleLogin = async (credentials: {
 		email: string;
 		senha: string;
+		tipo: 'cliente' | 'estabelecimento';
 	}) => {
 		clearError();
 		await login(credentials);
@@ -71,6 +72,7 @@ export default function LoginPage() {
 					{/* Formulário de Login */}
 					<LoginForm
 						onSubmit={handleLogin}
+						userType={activeTab}
 						isLoading={isLoading}
 						error={error}
 					/>

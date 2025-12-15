@@ -57,6 +57,7 @@ export interface AuthState {
 export interface LoginCredentials {
 	email: string;
 	senha: string;
+	tipo: 'cliente' | 'estabelecimento';
 }
 
 /**

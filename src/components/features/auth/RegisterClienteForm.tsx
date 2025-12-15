@@ -27,6 +27,7 @@ export function RegisterClienteForm({
 		cpf: '',
 		data_nascimento: '',
 	});
+	const [showSenha, setShowSenha] = useState(false);
 
 	const handleChange = (field: keyof RegisterClienteData, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
@@ -102,21 +103,33 @@ export function RegisterClienteForm({
 				>
 					Senha *
 				</label>
-				<input
-					id="senha"
-					type="password"
-					value={formData.senha}
-					onChange={(e) => handleChange('senha', e.target.value)}
-					required
-					disabled={isLoading}
-					minLength={6}
-					className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-						focus:ring-2 focus:ring-blue-500 focus:border-transparent
-						bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-						disabled:opacity-50 disabled:cursor-not-allowed
-						transition-colors"
-					placeholder="Mínimo 6 caracteres"
-				/>
+				<div className="relative">
+					<input
+						id="senha"
+						type={showSenha ? 'text' : 'password'}
+						value={formData.senha}
+						onChange={(e) => handleChange('senha', e.target.value)}
+						required
+						disabled={isLoading}
+						minLength={6}
+						className="w-full px-4 py-2 pr-24 border border-gray-300 dark:border-gray-600 rounded-lg 
+							focus:ring-2 focus:ring-blue-500 focus:border-transparent
+							bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+							disabled:opacity-50 disabled:cursor-not-allowed
+							transition-colors"
+						placeholder="Mínimo 6 caracteres"
+					/>
+					<button
+						type="button"
+						onClick={() => setShowSenha((v) => !v)}
+						disabled={isLoading}
+						className="absolute inset-y-0 right-2 px-3 text-sm font-medium text-gray-600 dark:text-gray-300 
+							bg-transparent hover:text-gray-900 dark:hover:text-white disabled:opacity-50"
+						aria-label={showSenha ? 'Ocultar senha' : 'Mostrar senha'}
+					>
+						{showSenha ? 'Ocultar' : 'Mostrar'}
+					</button>
+				</div>
 			</div>
 
 			{/* Telefone */}

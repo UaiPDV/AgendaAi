@@ -10,6 +10,74 @@ router.use(authenticateToken);
 router.use(isEstabelecimento);
 
 /**
+ * @openapi
+ * /api/profissionais:
+ *   post:
+ *     tags: [Estabelecimento - Profissionais]
+ *     summary: Cria um profissional para o estabelecimento logado
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [nome]
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               telefone:
+ *                 type: string
+ *               especialidades:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               horario_entrada:
+ *                 type: string
+ *               horario_saida:
+ *                 type: string
+ *               dias_trabalho:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       201:
+ *         description: Profissional criado
+ * /api/profissionais/{id}:
+ *   put:
+ *     tags: [Estabelecimento - Profissionais]
+ *     summary: Atualiza dados de um profissional
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Profissional atualizado
+ *       404:
+ *         description: Não encontrado
+ *   delete:
+ *     tags: [Estabelecimento - Profissionais]
+ *     summary: Remove um profissional
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Profissional removido
+ */
+
+/**
  * POST /api/profissionais
  * Cria um novo profissional para o estabelecimento logado.
  */

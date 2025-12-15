@@ -8,6 +8,148 @@ const router = Router();
 router.use(authenticateToken);
 
 /**
+ * @openapi
+ * /api/agendamentos:
+ *   get:
+ *     tags: [Cliente - Agendamentos, Estabelecimento - Agendamentos]
+ *     summary: Lista agendamentos do usuário logado (filtros para estabelecimento)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: data_inicio
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: data_fim
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: profissional_id
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de agendamentos
+ *   post:
+ *     tags: [Cliente - Agendamentos]
+ *     summary: Cria um agendamento (cliente)
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [estabelecimentoId, servicoId, profissionalId, data, horario]
+ *             properties:
+ *               estabelecimentoId:
+ *                 type: string
+ *               servicoId:
+ *                 type: string
+ *               profissionalId:
+ *                 type: string
+ *               data:
+ *                 type: string
+ *                 format: date
+ *               horario:
+ *                 type: string
+ *                 example: '14:00'
+ *     responses:
+ *       201:
+ *         description: Agendamento criado
+ *       409:
+ *         description: Horário indisponível
+ * /api/agendamentos/{id}:
+ *   patch:
+ *     tags: [Estabelecimento - Agendamentos, Cliente - Agendamentos]
+ *     summary: Atualiza status do agendamento
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [status]
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [confirmado, cancelado, concluido, nao_compareceu]
+ *     responses:
+ *       200:
+ *         description: Status atualizado
+ * /api/agendamentos/{id}/reagendar:
+ *   put:
+ *     tags: [Cliente - Agendamentos, Estabelecimento - Agendamentos]
+ *     summary: Reagenda um agendamento
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [data, horario]
+ *             properties:
+ *               data:
+ *                 type: string
+ *                 format: date
+ *               horario:
+ *                 type: string
+ *               profissionalId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Agendamento reagendado
+ *       409:
+ *         description: Novo horário indisponível
+ *   delete:
+ *     tags: [Cliente - Agendamentos, Estabelecimento - Agendamentos]
+ *     summary: Exclui um agendamento
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Agendamento removido
+ */
+
+/**
  * GET /api/agendamentos
  * Lista agendamentos com filtros opcionais para estabelecimentos.
  * Query Params (para estabelecimentos): ?data_inicio=YYYY-MM-DD&data_fim=YYYY-MM-DD&status=...&profissional_id=...&page=1&limit=10

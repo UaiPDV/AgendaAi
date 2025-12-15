@@ -6,6 +6,19 @@ const router = Router();
 router.use(authenticateToken);
 
 /**
+ * @openapi
+ * /api/financas/me:
+ *   get:
+ *     tags: [Cliente - Financeiro, Estabelecimento - Financeiro]
+ *     summary: Retorna resumo financeiro do usuário logado
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Resumo financeiro
+ */
+
+/**
  * GET /api/financas/me
  * Retorna dados financeiros agregados para o usuário logado (cliente ou estabelecimento).
  * (Implementação SIMPLIFICADA)

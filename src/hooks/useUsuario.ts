@@ -4,7 +4,17 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { apiRequest, API_ENDPOINTS } from '@/lib/api';
+import { getAuthToken, getUserData } from '@/lib/utils/auth';
 import type { DadosUsuario, PreferenciasNotificacao } from '@/types';
+
+const normalizeDados = (dados: Partial<DadosUsuario> & { data_nascimento?: string }): DadosUsuario => ({
+	id: dados.id,
+	nome: dados.nome ?? '',
+	cpf: dados.cpf ?? '',
+	email: dados.email ?? '',
+	telefone: dados.telefone ?? '',
+	dataNascimento: dados.dataNascimento ?? dados.data_nascimento ?? '',
+});
 
 export function useUsuario() {
 	const [dados, setDados] = useState<DadosUsuario | null>(null);
@@ -14,21 +24,37 @@ export function useUsuario() {
 	const [error, setError] = useState<string | null>(null);
 
 	const fetchDados = useCallback(async () => {
+		const token = getAuthToken();
+		const user = getUserData();
+
+		if (!token || !user?.id) {
+			setError('Usuário não autenticado');
+			setLoading(false);
+			return;
+		}
+
 		try {
 			setLoading(true);
 			setError(null);
 
-			// TODO: Pegar ID do usuário logado do contexto de autenticação
-			const usuarioId = 'user-1';
+			const dadosUsuario = await apiRequest<DadosUsuario>(
+				API_ENDPOINTS.USUARIO_ME,
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
 
-			const [dadosUsuario, preferencias] = await Promise.all([
-				apiRequest<DadosUsuario>(API_ENDPOINTS.USUARIO_BY_ID(usuarioId)),
-				apiRequest<PreferenciasNotificacao>(
-					API_ENDPOINTS.PREFERENCIAS_NOTIFICACAO(usuarioId)
+			const preferencias: PreferenciasNotificacao = {
+				lembretes: Boolean(
+					(dadosUsuario as any).notif_lembretes ?? true
 				),
-			]);
+				promocoes: Boolean(
+					(dadosUsuario as any).notif_promocoes ?? true
+				),
+				confirmacoes: true,
+			};
 
-			setDados(dadosUsuario);
+			setDados(normalizeDados(dadosUsuario));
 			setPreferenciasNotificacao(preferencias);
 		} catch (err) {
 			setError('Erro ao carregar dados do usuário');
@@ -43,18 +69,18 @@ export function useUsuario() {
 	}, [fetchDados]);
 
 	const atualizarDados = useCallback(async (novosDados: DadosUsuario) => {
+		const token = getAuthToken();
+		if (!token) return false;
 		try {
-			// TODO: Pegar ID do usuário logado do contexto de autenticação
-			const usuarioId = 'user-1';
-
 			const dadosAtualizados = await apiRequest<DadosUsuario>(
-				API_ENDPOINTS.USUARIO_BY_ID(usuarioId),
+				API_ENDPOINTS.USUARIO_ME,
 				{
 					method: 'PUT',
 					body: JSON.stringify(novosDados),
+					headers: { Authorization: `Bearer ${token}` },
 				}
 			);
-			setDados(dadosAtualizados);
+			setDados(normalizeDados(dadosAtualizados));
 			return true;
 		} catch (err) {
 			console.error(err);
@@ -64,19 +90,30 @@ export function useUsuario() {
 
 	const atualizarPreferencias = useCallback(
 		async (novasPreferencias: PreferenciasNotificacao) => {
+			const token = getAuthToken();
+			if (!token) return false;
 			try {
-				// TODO: Pegar ID do usuário logado do contexto de autenticação
-				const usuarioId = 'user-1';
+				const atualizadas = await apiRequest<DadosUsuario>(
+					API_ENDPOINTS.USUARIO_ME,
+					{
+						method: 'PUT',
+						body: JSON.stringify({
+							notif_lembretes: novasPreferencias.lembretes,
+							notif_promocoes: novasPreferencias.promocoes,
+						}),
+						headers: { Authorization: `Bearer ${token}` },
+					}
+				);
 
-				const preferenciasAtualizadas =
-					await apiRequest<PreferenciasNotificacao>(
-						API_ENDPOINTS.PREFERENCIAS_NOTIFICACAO(usuarioId),
-						{
-							method: 'PUT',
-							body: JSON.stringify(novasPreferencias),
-						}
-					);
-				setPreferenciasNotificacao(preferenciasAtualizadas);
+				setPreferenciasNotificacao({
+					lembretes: Boolean(
+						(atualizadas as any).notif_lembretes ?? true
+					),
+					promocoes: Boolean(
+						(atualizadas as any).notif_promocoes ?? true
+					),
+					confirmacoes: true,
+				});
 				return true;
 			} catch (err) {
 				console.error(err);

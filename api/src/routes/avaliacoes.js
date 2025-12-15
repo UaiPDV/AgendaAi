@@ -9,6 +9,37 @@ router.use(authenticateToken);
 router.use(isCliente);
 
 /**
+ * @openapi
+ * /api/avaliacoes:
+ *   post:
+ *     tags: [Cliente - Avaliacoes]
+ *     summary: Cria uma avaliação para um agendamento concluído
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [agendamento_id, nota]
+ *             properties:
+ *               agendamento_id:
+ *                 type: string
+ *               nota:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *               comentario:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Avaliação criada
+ *       409:
+ *         description: Agendamento já avaliado
+ */
+
+/**
  * POST /api/avaliacoes
  * Cria uma nova avaliação para um agendamento concluído.
  */

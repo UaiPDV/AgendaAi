@@ -8,6 +8,46 @@ router.use(authenticateToken);
 router.use(isEstabelecimento);
 
 /**
+ * @openapi
+ * /contas-receber:
+ *   get:
+ *     summary: Lista contas a receber
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+         
+ *       - in: query
+ *         name: data_inicio
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: data_fim
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Lista de contas a receber
+ *       401:
+ *         description: Token ausente ou inválido
+ * /contas-receber/resumo:
+ *   get:
+ *     summary: Resumo financeiro das contas a receber
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Resumo calculado
+ *       401:
+ *         description: Token ausente ou inválido
+ */
+
+/**
  * GET /api/contas-receber
  * Lista todas as contas a receber do estabelecimento
  */

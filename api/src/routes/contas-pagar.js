@@ -8,6 +8,45 @@ router.use(authenticateToken);
 router.use(isEstabelecimento);
 
 /**
+ * @openapi
+ * /contas-pagar:
+ *   get:
+ *     summary: Lista contas a pagar
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: data_inicio
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: data_fim
+ *         schema:
+ *           type: string
+ *           format: date
+ *     responses:
+ *       200:
+ *         description: Lista de contas a pagar
+ *       401:
+ *         description: Token ausente ou inválido
+ * /contas-pagar/resumo:
+ *   get:
+ *     summary: Resumo financeiro das contas a pagar
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Resumo calculado
+ *       401:
+ *         description: Token ausente ou inválido
+ */
+
+/**
  * GET /api/contas-pagar
  * Lista todas as contas a pagar do estabelecimento
  */

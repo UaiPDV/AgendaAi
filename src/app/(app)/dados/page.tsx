@@ -26,7 +26,15 @@ export default function DadosPage() {
 
 	useEffect(() => {
 		if (dados) {
-			setFormData(dados);
+			setFormData((prev) => ({
+				nome: '',
+				cpf: '',
+				email: '',
+				telefone: '',
+				dataNascimento: '',
+				...prev,
+				...dados,
+			}));
 		}
 	}, [dados]);
 

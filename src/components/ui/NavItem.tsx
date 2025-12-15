@@ -26,7 +26,7 @@ export function NavItem({
 		<Link
 			href={href}
 			className={`
-				group relative flex items-center text-sm font-medium rounded-md transition-all
+				group relative flex items-center text-sm font-medium rounded-md transition-all select-none
 				${collapsed ? 'justify-center px-3 py-2' : 'justify-start px-3 py-2'}
 				${
 					isActive

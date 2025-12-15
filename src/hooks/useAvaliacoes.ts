@@ -4,6 +4,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { apiRequest, API_ENDPOINTS } from '@/lib/api';
+import { getAuthToken } from '@/lib/utils/auth';
 import type { Avaliacao } from '@/types';
 
 export function useAvaliacoes() {
@@ -15,7 +16,18 @@ export function useAvaliacoes() {
 		try {
 			setLoading(true);
 			setError(null);
-			const data = await apiRequest<Avaliacao[]>(API_ENDPOINTS.AVALIACOES);
+
+			const token = getAuthToken();
+			if (!token) {
+				setError('Usuário não autenticado');
+				setLoading(false);
+				return;
+			}
+
+			const data = await apiRequest<Avaliacao[]>(
+				API_ENDPOINTS.AVALIACOES_ME,
+				{ token }
+			);
 			setAvaliacoes(data);
 		} catch (err) {
 			setError('Erro ao carregar avaliações');
@@ -32,14 +44,17 @@ export function useAvaliacoes() {
 	const avaliar = useCallback(
 		async (agendamentoId: string, nota: number, comentario: string) => {
 			try {
+				const token = getAuthToken();
+				if (!token) return false;
+
 				await apiRequest(API_ENDPOINTS.AVALIACOES, {
 					method: 'POST',
 					body: JSON.stringify({
-						agendamentoId,
+						agendamento_id: agendamentoId,
 						nota,
 						comentario,
-						usuarioId: 'user-1', // TODO: Pegar do contexto de autenticação
 					}),
+					token,
 				});
 				await fetchAvaliacoes();
 				return true;

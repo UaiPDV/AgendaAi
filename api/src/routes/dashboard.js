@@ -8,6 +8,19 @@ router.use(authenticateToken);
 router.use(isEstabelecimento);
 
 /**
+ * @openapi
+ * /api/dashboard/metrics:
+ *   get:
+ *     tags: [Estabelecimento - Dashboard]
+ *     summary: Retorna métricas do dashboard do estabelecimento
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Métricas retornadas
+ */
+
+/**
  * GET /api/dashboard/metrics
  * Retorna métricas básicas para o dashboard do estabelecimento.
  * (Implementação SIMPLIFICADA)

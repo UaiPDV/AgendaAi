@@ -8,6 +8,37 @@ router.use(authenticateToken);
 router.use(isEstabelecimento);
 
 /**
+ * @openapi
+ * /api/relatorios/servicos-mais-agendados:
+ *   get:
+ *     tags: [Estabelecimento - Relatorios]
+ *     summary: Retorna top serviços mais agendados
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de serviços
+ * /api/relatorios/desempenho-profissionais:
+ *   get:
+ *     tags: [Estabelecimento - Relatorios]
+ *     summary: Retorna desempenho por profissional
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de desempenho
+ * /api/relatorios/taxa-cancelamento:
+ *   get:
+ *     tags: [Estabelecimento - Relatorios]
+ *     summary: Retorna taxa de cancelamento
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Taxa calculada
+ */
+
+/**
  * GET /api/relatorios/servicos-mais-agendados
  * Retorna contagem de agendamentos concluídos por serviço.
  * (Implementação SIMPLIFICADA)
